@@ -1,4 +1,4 @@
-package spqEval;
+﻿package spqEval;
 
 /** ===============================================================================
 * SpermQEvaluator_.java Version 0.0.2
@@ -329,7 +329,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 				Result r = new Result(filesToOpen.get(i).getPath(),5);
 				results.add(r);
 				if(r.valid == false){
-					this.logMessage("The metadata for task " + i + " could not be retrieved!", NOTIF);
+					this.logMessage("The metadata for task " + (i + 1) + " could not be retrieved!", NOTIF);
 //				}else{
 //					System.out.println("valid");
 				}
@@ -337,12 +337,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 				progressBar.setValue((int)Math.round((double)(i+1.0)*(10.0/(double)filesToOpen.size())));
 //				progressBar.updateUI();
 				
-				/**
-				 * TODO @sRassmann
-				 * Funktion aufrufen, um ein Übersichts-PDF für dieses Result zu speichern
-				 * 
-				 * 
-				 * */
+				PDFPage page = new PDFPage(r.directory, filesToOpen.get(i).getName(), outputFolder.getPath() + System.getProperty("file.separator"));
 				
 			}
 			//save list of results data
