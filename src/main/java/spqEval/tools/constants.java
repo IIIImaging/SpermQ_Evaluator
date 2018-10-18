@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 /** ===============================================================================
-* SpermQEvaluator_.java Version 0.0.2
+* SpermQEvaluator_.java Version 1.0.1
 * 
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
