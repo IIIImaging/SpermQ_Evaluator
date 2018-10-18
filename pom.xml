@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.scijava</groupId>
+		<artifactId>pom-scijava</artifactId>
+		<version>14.0.0</version>
+		<relativePath />
+	</parent>
+  
+<!-- Plugin Information -->
+	<groupId>IIIImaging</groupId>
+	<artifactId>SpermQ_Evaluator</artifactId>
+	<version>0.0.2-SNAPSHOT</version>
+	<name>SpermQ Evaluator</name>
+	<description>Evaluation tool for SpermQ results folders.</description>
+ 	<inceptionYear>2017</inceptionYear>	
+	<url>https://github.com/IIIImaging/SpermQ_Evaluator</url>
+	<organization>
+		<name>IIIImaging</name>
+		<url>https://github.com/IIIImaging/</url>
+	</organization>
+		
+	<mailingLists>
+		<mailingList>
+			<name>Github/hansenjn</name>
+			<archive>https://github.com/hansenjn/</archive>
+		</mailingList>
+	</mailingLists>	
+		
+	<licenses>
+		<license>
+			<name>GNU General Public License v3+</name>
+			<url>http://www.gnu.org/licenses/gpl.html</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	
+    <developers>
+        <developer>
+            <id></id>
+            <name>Jan N Hansen</name>
+            <email>jan.hansen@caesar.de</email>
+            <url>r</url>
+            <organization>University of Bonn - Institue of Innate immunity - Biophysical Imaging</organization>
+            <organizationUrl>http://www.iii.uni-bonn.de/en/wachten_lab/</organizationUrl>
+            <roles>
+                <role>founder</role>
+                <role>lead</role>
+                <role>developer</role>
+                <role>debugger</role>
+                <role>reviewer</role>
+                <role>support</role>
+                <role>maintainer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <id></id>
+            <name>Sebastian Raßmann</name>
+            <email>rassmann@uni-bonn.de</email>
+            <url>r</url>
+            <organization>University of Bonn - Institue of Innate immunity - Biophysical Imaging</organization>
+            <organizationUrl>http://www.iii.uni-bonn.de/en/wachten_lab/</organizationUrl>
+            <roles>
+                <role>founder</role>
+                <role>lead</role>
+                <role>developer</role>
+                <role>debugger</role>
+                <role>reviewer</role>
+                <role>support</role>
+                <role>maintainer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+    
+    <contributors>
+        <!--
+        NB: Need a least one element to override the parent.
+        See: https://issues.apache.org/jira/browse/MNG-5220
+        -->
+        <contributor><name>None</name></contributor>
+    </contributors>
+ 
+ 	<issueManagement>
+		<system>GitHub Issues</system>		
+	</issueManagement>
+ 	
+ 	<ciManagement>
+		<system>none</system>
+	</ciManagement>
+ 
+ 	<properties>
+		<main-class>Main</main-class>
+		<package-name>spqEval</package-name>
+		<license.licenseName>gpl_v3</license.licenseName>
+		<license.copyrightOwners>Jan Niklas Hansen &amp; Sebastian Raßmann</license.copyrightOwners>
+		<license.projectName>SpermQ Evaluator</license.projectName>
+	</properties> 
+ 
+  	<scm>
+		<connection>scm:git:git://github.com/IIIImaging/SpermQ_Evaluator</connection>
+		<developerConnection>scm:git:git@github.com:IIIImaging/SpermQ_Evaluator</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/IIIImaging/SpermQ_Evaluator</url>
+	</scm>
+ 
+<!--  	 <repositories> -->
+<!--         NB: for project parent, in case of partial checkout -->
+<!--         <repository> -->
+<!--             <id>imagej.public</id> -->
+<!--             <url>http://maven.imagej.net/content/groups/public</url> -->
+<!--         </repository> -->
+<!--     </repositories> -->
+ 
+<!-- TODO: See Optional Dependencies section -->
+    <dependencies>
+        <!-- ImageJ dependencies -->
+        <dependency>
+            <groupId>net.imagej</groupId>
+            <artifactId>ij</artifactId>
+        </dependency> 		        
+    </dependencies>  
+    <build>
+		<plugins>
+			<!--         avoid errors in java doc creation			 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<additionalparam>-Xdoclint:none</additionalparam>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<projectName>CiliaQ plugin for ImageJ.</projectName>
+					<organizationName>Jan Niklas Hansen</organizationName>
+					<descriptorRefs>
+            			<descriptorRef>jar-with-dependencies</descriptorRef>
+          			</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>${main-class}</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			
+
+		</plugins>
+	</build>  	
+</project>
