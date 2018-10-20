@@ -168,9 +168,9 @@ public class PDFTools {
 		try {
             cts.beginText();
             PDFont font = PDType1Font.HELVETICA_BOLD;
-    		float lenght = font.getStringWidth(text)/1000*textSize;
+    		float length = font.getStringWidth(text)/1000*textSize;
 			cts.setFont(font, textSize);
-			cts.setTextMatrix(Matrix.getRotateInstance(Math.PI / 2, leftBound, yCenter - lenght/2)); 			// rotate the text according to the page rotation
+			cts.setTextMatrix(Matrix.getRotateInstance(Math.PI / 2, leftBound, yCenter - length/2)); 			// rotate the text according to the page rotation
 			cts.showText(text);
 			cts.endText();
         }

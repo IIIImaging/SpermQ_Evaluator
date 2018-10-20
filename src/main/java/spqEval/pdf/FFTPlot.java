@@ -173,7 +173,7 @@ public class FFTPlot extends PDFPlot {
 				System.out.println("exception in addSideDesc");
 			}
 		}
-		PDFTools.insertTextBoxXCentered(cts, pX0 + pW/2, pY0 - pdt.space*2 - pdt.descSize, "arc lenght (µm)", pdt.subDescSize);
+		PDFTools.insertTextBoxXCentered(cts, pX0 + pW/2, pY0 - pdt.space*2 - pdt.descSize, "arc length (µm)", pdt.subDescSize);
 		
 	}
 	

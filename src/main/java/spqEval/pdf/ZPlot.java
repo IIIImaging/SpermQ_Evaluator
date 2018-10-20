@@ -214,7 +214,7 @@ public class ZPlot extends PDFPlot {
 				System.out.println("exception in addSideDesc");
 			}
 		}
-		PDFTools.insertTextBoxXCentered(cts, aX0 + aW/2, aY0 - pdt.space*2 - pdt.descSize, "arc lenght (µm)", pdt.subDescSize);
+		PDFTools.insertTextBoxXCentered(cts, aX0 + aW/2, aY0 - pdt.space*2 - pdt.descSize, "arc length (µm)", pdt.subDescSize);
 		
 	}
 	

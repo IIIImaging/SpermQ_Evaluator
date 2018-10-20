@@ -46,6 +46,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
+
+import spqEval.pdf.PDFPage;
 import spqEval.tools.constants;
 import spqEval.tools.tools;
 
