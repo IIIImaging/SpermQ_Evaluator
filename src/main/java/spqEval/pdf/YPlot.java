@@ -110,17 +110,15 @@ public class YPlot extends PDFPlot {
 			PDImageXObject averagePlot = PDImageXObject.createFromFile(averagePlotPath, doc);
 			
 			cts.drawImage(rangePlot, rX0, rY0, rW, rH);	
-			cts.drawImage(averagePlot, aX0, aY0, aW, aH);
-					
-			addDescRange();
-			addDescAverage();
-			addLowerDesc();
-			
+			cts.drawImage(averagePlot, aX0, aY0, aW, aH);			
 		}
 		catch(Exception e){
 			System.out.println(e.getMessage());
 			System.out.println("error! - caught Exception !");
 		}
+		addDescRange();
+		addDescAverage();
+		addLowerDesc();
 	}
 	
 	protected void renderPlot() {
@@ -253,7 +251,7 @@ public class YPlot extends PDFPlot {
 		int x2 = aX0 - pdt.space*2;
 		float yCorrectionNumbers = pdt.subDescSize/2;
 		
-		int numberOfIndicators = (int) (yMaxAv / yBaseValueAv);
+		int numberOfIndicators = (int) ((yMaxAv-yMinAv) / yBaseValueAv);
 		
 		for(int z = 0; z <= numberOfIndicators; z++) {
 			try {
@@ -263,7 +261,7 @@ public class YPlot extends PDFPlot {
 				System.out.println("exception in addSideDesc");
 			}
 		}
-		PDFTools.insertTextBoxToRightBoundYCentrated(cts, x2, aY0 + yCorrectionNumbers, Integer.toString((int) (0)), pdt.subDescSize);
+		PDFTools.insertTextBoxToRightBoundYCentrated(cts, x2, aY0 + yCorrectionNumbers, Integer.toString((int) (yMinAv)), pdt.subDescSize);
 		PDFTools.insertTextBoxToRightBound(cts, x2, aY0 + aH + yCorrectionNumbers, Integer.toString((int) (yMaxAv)), pdt.subDescSize);
 		try {
 			cts.drawLine(aX0, aY0, aX0, aY0 + aH + pdt.lineWidth);

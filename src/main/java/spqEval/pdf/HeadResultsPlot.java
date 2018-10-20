@@ -124,6 +124,7 @@ public class HeadResultsPlot extends PDFPlot {
 		hri = new XYSeries ("hriMax_plot");
 
 		Result r = new Result(PDFPage.sourcePath, 5);
+
 		float [][] rawData = r.getHeadResults();
 		
 		xMax = rawData[0].length/timeOfStack;

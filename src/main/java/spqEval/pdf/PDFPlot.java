@@ -58,6 +58,6 @@ public class PDFPlot extends PDFPage {
 	@Override
 	protected void addDesc() {
 		PDFTools.insertTextBoxUpperY(cts, x, y + 2*pdt.space, "(" + cID + ")" , pdt.headerSize);
-		PDFTools.insertTextBoxLowerY(cts, dX0, dY0 - ID * (pdt.descSize + pdt.space), "(" + cID + ") " + desc, pdt.descSize);		
+		PDFTools.insertTextBoxLowerY(cts, dX0, dY0 - ID * (pdt.descSize + pdt.space), "(" + cID + ") " + desc, pdt.descSize);	
 	}
 }

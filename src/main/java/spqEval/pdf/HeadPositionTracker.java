@@ -109,6 +109,11 @@ public class HeadPositionTracker extends PDFPage{
 			cts.drawImage(pdImage, iX0, iY0, iW, iH);			//draw image
 			cts.drawImage(pdBox, bX0, bY0, bW, bH);			//draw Calibration Box
 			
+			if(figRange == 0) {
+				PDFTools.insertTextBoxXCentered(cts, iX0 + iW/2, (iY0 + iH/2 + 10 + pdt.space), "Figure not created", 10);
+				PDFTools.insertTextBoxXCentered(cts, iX0 + iW/2, (iY0 + iH/2), "Head does not move", 10);
+			}
+			
 			PDFTools.insertTextBoxXCentered(cts, bX0, bY0-pdt.space, dFormat2.format(0.000f), pdt.descSize);
 			PDFTools.insertTextBoxXCentered(cts, bX0+bW, bY0-pdt.space, dFormat2.format(timeOfStack), pdt.descSize);		
 			PDFTools.insertTextBoxXCentered(cts, bX0+(bW/2), bY0-pdt.space, "time (sec)", pdt.descSize);	
@@ -135,10 +140,18 @@ public class HeadPositionTracker extends PDFPage{
 		
 		fillPositionArray();
 		
-		int imageSize = (int) (figRange / xyCalibration);		//defines height and width of the output images in IJ (in pixels)
-		ImagePlus impOut = IJ.createImage(name, "RGB white", imageSize, imageSize, 1);		
-		for(int t = 0; t < numberOfFrames; t++) {
-			impOut.getProcessor().putPixel((int) Math.round(xValues[t]*imageSize), (int) Math.round(yValues[t]*imageSize), lut.getRGBValue(t,numberOfFrames-1));
+		ImagePlus impOut;
+		
+		if(figRange == 0) {
+			impOut = IJ.createImage(name, "RGB white", 1, 1, 1);
+		}
+		else {
+			int imageSize = (int) (figRange / xyCalibration); // defines height and width of the output images in IJ (in pixels)
+			impOut = IJ.createImage(name, "RGB white", imageSize, imageSize, 1);
+			for (int t = 0; t < numberOfFrames; t++) {
+				impOut.getProcessor().putPixel((int) Math.round(xValues[t] * imageSize),
+						(int) Math.round(yValues[t] * imageSize), lut.getRGBValue(t, numberOfFrames - 1));
+			}
 		}
 		IJ.saveAs(impOut, "BMP", imagePath);
 		impOut.changes = false;
