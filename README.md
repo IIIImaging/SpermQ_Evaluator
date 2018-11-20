@@ -6,4 +6,4 @@ Copyright (C) 2017-2018: <b>Jan N. Hansen</b>, Sebastian Rassmann, Jan F. Jikeli
 
 Funding: DFG priority program SPP 1726 "Microswimmers".
 
-This software is part of the following publication: https://www.biorxiv.org/content/early/2018/10/21/449173
+This software is part of the following publication: https://www.biorxiv.org/content/early/2018/10/21/449173.
