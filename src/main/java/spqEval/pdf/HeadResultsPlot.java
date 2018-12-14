@@ -83,7 +83,7 @@ public class HeadResultsPlot extends PDFPlot {
 		velocityPlotPath = targetPath + nameOfThetaPlot;
 		hriMaxPlotPath = targetPath + nameOfHRIMaxPlot;
 		
-		desc = "upper panel: orientation of head-midpiece axis in space, middle panel: velocity of head in space, bottom panel: head rolling";
+		desc = "upper panel: orientation of head-midpiece axis in space, middle panel: velocity of head in space, bottom panel: rolling";
 		
 		getData();
 
