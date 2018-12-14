@@ -1,7 +1,7 @@
 ﻿package spqEval;
 
 /** ===============================================================================
-* SpermQEvaluator_.java Version 1.0.1
+* SpermQEvaluator_.java Version 1.0.2
 * 
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -52,11 +52,13 @@ import spqEval.tools.constants;
 import spqEval.tools.tools;
 
 public class Main extends javax.swing.JFrame implements ActionListener {
+	private static final String version = "1.0.2";
+	
 	private static final long serialVersionUID = 1L;	
 	
 	private static String referenceLine = "This file was generated using SpermQ_Evaluator,"
 			+ " a java application by Jan Niklas Hansen (\u00a9 2017 - 2018)"
-			+ " (all rights reserved, mail adress: jan.hansen@uni-bonn.de).";
+			+ " (for credits see: https://github.com/IIIImaging/SpermQ_Evaluator).";
 	
 	public static final int ERROR = 0;
 	public static final int NOTIF = 1;
@@ -64,11 +66,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 	
 	static final SimpleDateFormat NameDateFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
 	static final SimpleDateFormat FullDateFormatter = new SimpleDateFormat("yyyy-MM-dd	HH:mm:ss");
-	
-	static final int licYear = 2017;
-	static final int licMonth = 6;
-	static final int licDay = 1;
-	
+		
 	static final String [] HEADRESULTS = {"angle theta", "head velocity (in 2D)", "max Intensity in head"};
 	static final String [] KYMORESULTS = {"Results Minimum:", "Results Maximum:", "Results Average:",
 			"Results Median:", "Results Amplitude (Max-Min):"};
@@ -126,7 +124,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 		int prefXSize = 600, prefYSize = 570;
 		this.setMinimumSize(new java.awt.Dimension(prefXSize, prefYSize+40));
 		this.setSize(prefXSize, prefYSize+40);			
-		this.setTitle("SpermQ Evaluator - by JN Hansen (\u00a9 2017 - 2018)");
+		this.setTitle("SpermQ Evaluator " + version + " (\u00a9 2017 - 2018)");
 //		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		//Surface
 			bgPanel = new JPanel();
@@ -140,7 +138,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 				topPanel.setPreferredSize(new java.awt.Dimension(prefXSize,60));
 				{
 					JTextPane text = new JTextPane();
-					text.setText("*** <SpermQ_Evaluator> is a tool by Jan Niklas Hansen (jan.hansen(at)uni-bonn.de), \u00a9 2017 - 2018 ***");
+					text.setText("*** Credits and copyright information: https://github.com/IIIImaging/SpermQ_Evaluator ***");
 					text.setBackground(this.getBackground());
 					text.setForeground(Color.DARK_GRAY);
 					text.setEditable(false);
@@ -455,13 +453,12 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 						resultsArray [i][k][2] = tools.getAverageOfRange(headFreqResult[k], 0, headFreqResult[k].length-1);
 						resultsArray [i][k][3] = tools.getMedianOfRange(headFreqResult[k], 0, headFreqResult[k].length-1);
 						
+					}else if(headFreqResult [k].length == 1){
+						resultsArray [i][k][0] = headFreqResult[k][0];
+						resultsArray [i][k][1] = headFreqResult[k][0];
+						resultsArray [i][k][2] = headFreqResult[k][0];
+						resultsArray [i][k][3] = headFreqResult[k][0];					
 					}
-//					else if(headFreqResult [k].length == 1){
-//						resultsArray [i][k][0] = headFreqResult[k][0];
-//						resultsArray [i][k][1] = headFreqResult[k][0];
-//						resultsArray [i][k][2] = headFreqResult[k][0];
-//						resultsArray [i][k][3] = headFreqResult[k][0];					
-//					}
 					else{
 						for(int l = 0; l < 4; l++){
 							resultsArray [i][k][l] = Float.NEGATIVE_INFINITY;
@@ -537,12 +534,12 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 						resultsArray [i][k][3] = tools.getMedianOfRange(headFreqResult[k], 0, headFreqResult[k].length-1);
 						
 					}
-//					else if(headFreqResult [k].length == 1){
-//						resultsArray [i][k][0] = headFreqResult[k][0];
-//						resultsArray [i][k][1] = headFreqResult[k][0];
-//						resultsArray [i][k][2] = headFreqResult[k][0];
-//						resultsArray [i][k][3] = headFreqResult[k][0];					
-//					}
+					else if(headFreqResult [k].length == 1){
+						resultsArray [i][k][0] = headFreqResult[k][0];
+						resultsArray [i][k][1] = headFreqResult[k][0];
+						resultsArray [i][k][2] = headFreqResult[k][0];
+						resultsArray [i][k][3] = headFreqResult[k][0];					
+					}
 					else{
 						for(int l = 0; l < 4; l++){
 							resultsArray [i][k][l] = Float.NEGATIVE_INFINITY;
@@ -827,14 +824,8 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 		double maxCal = 0.0;
 //		double minCal = Double.MAX_VALUE;
 		for(int i = 0; i < results.size(); i++){
-//			if(results.get(i).valid){
-//				System.out.println("valid1");
-//			}else{
-//				System.out.println("invalid");
-//			}
 			float kymoRes [][] = results.get(i).getKymoResults(keySeq);
 			if(results.get(i).valid){
-//				System.out.println("valid2");
 				if(maxAl < kymoRes.length * results.get(i).calibration){
 					maxAl = (float)(kymoRes.length * results.get(i).calibration);
 				}
@@ -847,11 +838,8 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 			}
 			kymoData.add(kymoRes);
 		}
-		
-		
+				
 		int maxPos = (int)Math.round(maxAl/maxCal)+1;
-		
-//		System.out.println("" + maxAl + " / " + maxCal + " = " + maxPos);
 		float [][][][] kymoDataArray = new float [kymoData.size()][maxPos][4][2];
 		{
 			for(int i = 0; i < kymoData.size(); i++){
@@ -1045,14 +1033,8 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 		double maxCal = 0.0;
 //		double minCal = Double.MAX_VALUE;
 		for(int i = 0; i < results.size(); i++){
-//			if(results.get(i).valid){
-//				System.out.println("valid1");
-//			}else{
-//				System.out.println("invalid");
-//			}
 			float kymoRes [][][] = results.get(i).getFreqResults(keySeq);
 			if(results.get(i).valid){
-//				System.out.println("valid2");
 				if(maxAl < kymoRes [0].length * results.get(i).calibration){
 					maxAl = (float)(kymoRes [0].length * results.get(i).calibration);
 				}
@@ -1068,8 +1050,6 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 		
 		
 		int maxPos = (int)Math.round(maxAl/maxCal)+1;
-		
-//		System.out.println("" + maxAl + " / " + maxCal + " = " + maxPos);
 		for(int f = 0; f < 5; f++){
 			float [][][][] kymoDataArray = new float [kymoData.size()][maxPos][4][2];
 			{

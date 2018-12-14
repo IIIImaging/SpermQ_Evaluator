@@ -11,7 +11,7 @@ import ij.ImagePlus;
 import spqEval.tools.*;
 
 /** ===============================================================================
-* SpermQEvaluator_.java Version 1.0.1
+* SpermQEvaluator_.java Version 1.0.2
 * 
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -383,12 +383,11 @@ public class Result {
 		if(maxSize == 0.0 && minSize == 0.0){
 			System.out.println("maxminSize = 0");
 			valid = false;
-			return null;	//TODO
+			return null;
 		}
 		
 		//Analyze image
 		ImagePlus imp = IJ.openImage(directory + System.getProperty("file.separator") + fileName);
-//		imp.show();
 		float value, value1, value2;
 		
 		float [][] results;
@@ -399,7 +398,6 @@ public class Result {
 		toSort = new float [imp.getHeight()];
 		Arrays.fill(median, 0.0f);
 
-//			for(int s = 0; s < imp.getNSlices(); s++){
 		{
 			int s = 0;
 			for(int al = 0; al < imp.getWidth(); al++){
