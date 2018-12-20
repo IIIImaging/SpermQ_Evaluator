@@ -1,7 +1,7 @@
 ﻿package spqEval;
 
 /** ===============================================================================
-* SpermQEvaluator_.java Version 1.0.2
+* SpermQEvaluator_.java Version 1.0.3
 * 
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -34,8 +34,10 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -47,12 +49,15 @@ import java.util.LinkedList;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 
+import ij.IJ;
+import ij.ImagePlus;
 import spqEval.pdf.PDFPage;
+import spqEval.pdf.PDFTools;
 import spqEval.tools.constants;
 import spqEval.tools.tools;
 
 public class Main extends javax.swing.JFrame implements ActionListener {
-	private static final String version = "1.0.2";
+	private static final String version = "1.0.3";
 	
 	private static final long serialVersionUID = 1L;	
 	
@@ -64,19 +69,21 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 	public static final int NOTIF = 1;
 	public static final int LOG = 2;
 	
+	static final double threshold = 0.70;
+	
 	static final SimpleDateFormat NameDateFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
 	static final SimpleDateFormat FullDateFormatter = new SimpleDateFormat("yyyy-MM-dd	HH:mm:ss");
 		
 	static final String [] HEADRESULTS = {"angle theta", "head velocity (in 2D)", "max Intensity in head"};
-	static final String [] KYMORESULTS = {"Results Minimum:", "Results Maximum:", "Results Average:",
-			"Results Median:", "Results Amplitude (Max-Min):"};
+	static final String [] KYMORESULTS = {"Results Minimum:", "Results Maximum:", 
+			"Results Median:", "Results Average:", "Results Amplitude:"};
 	static final String [] KYMOFREQRESULTS = {"primary frequency", "peak height of primary frequency",
 			"secondary frequency", "peak height of secondary frequency",
 			"center-of-mass of frequency spectrum"};
 	static final String [] HEADSAVE = {"Th2D", "HV", "HMaxI"};
-	static final String [] KYMOSAVE = {"min", "max", "avg","medi", "ampl"};
+	static final String [] KYMOSAVE = {"min", "max", "medi", "avg", "ampl"};
 	static final String [] KYMOSAVEFREQ = {"f1", "a1", "f2","a2", "com"};
-		
+			
 	LinkedList<File> filesToOpen = new LinkedList<File>();
 	boolean done = false, dirSaved = false;
 	File savedDir;// = new File(getClass().getResource(".").getFile());
@@ -115,7 +122,11 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 		try{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}catch(Exception e){
-			
+			String out = "";
+			for(int err = 0; err < e.getStackTrace().length; err++){
+				out += " \n " + e.getStackTrace()[err].toString();
+			}
+			this.logMessage("Exception while setting look and feel:" + out, NOTIF);			
 		}
 		
 		File home = FileSystemView.getFileSystemView().getHomeDirectory(); 
@@ -310,35 +321,47 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 		goButton.setEnabled(false);
 		removeButton.setEnabled(false);
 		loadButton.setEnabled(false);
+		progressBar.setString("analyzing");
 		bgPanel.updateUI();
 		
 		this.clearLog();
 		//create new file
 		Date now = new Date();
+		
 		File outputFolder = new File(desktopPath + System.getProperty("file.separator") 
 			+ "SPQEV " + NameDateFormatter.format(now) + System.getProperty("file.separator"));
-//		try {
+		PDFPage page;
+
+		//create Result objects
+		ArrayList<Result> results = new ArrayList<Result>(filesToOpen.size());
+		try {
 			// if file doesnt exists, then create it
 			if (!outputFolder.exists()) {
 				outputFolder.mkdir();
-			}
-			
-			//create Result objects
-			ArrayList<Result> results = new ArrayList<Result>(filesToOpen.size());
+			}			
+			int slicesPerCycle [] = new int [filesToOpen.size()];
+			Arrays.fill(slicesPerCycle, 0);
 			for(int i = 0; i < filesToOpen.size(); i++){
-				Result r = new Result(filesToOpen.get(i).getPath(),5);
+				Result r = new Result(filesToOpen.get(i).getPath(),threshold);
 				results.add(r);
 				if(r.valid == false){
 					this.logMessage("The metadata for task " + (i + 1) + " could not be retrieved!", NOTIF);
 //				}else{
 //					System.out.println("valid");
 				}
-				
+				progressBar.setString("Producing PDF for file " + (i+1) + " of " + filesToOpen.size());		
+				try{
+					page = new PDFPage(r.directory, filesToOpen.get(i).getName(), outputFolder.getPath() + System.getProperty("file.separator"),r.threshold);
+					slicesPerCycle [i] = (int) page.getSlicesPerCycle();
+				}catch(Exception e){
+					String out = "";
+					for(int err = 0; err < e.getStackTrace().length; err++){
+						out += " \n " + e.getStackTrace()[err].toString();
+					}
+					this.logMessage("Failed to produce PDF for file " + (i+1) + " \n Error message:\n" 
+							+ e.getCause() + "\n" + out, ERROR);
+				}				
 				progressBar.setValue((int)Math.round((double)(i+1.0)*(10.0/(double)filesToOpen.size())));
-//				progressBar.updateUI();
-				
-				PDFPage page = new PDFPage(r.directory, filesToOpen.get(i).getName(), outputFolder.getPath() + System.getProperty("file.separator"));
-				
 			}
 			//save list of results data
 			this.saveResultsList(outputFolder, now);				
@@ -349,7 +372,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 			String [] kymoTypes = {"cAng", "Curv", "X", "Y", "Z"};
 			for(int t = 0; t < kymoTypes.length; t++){
 				progressBar.setString("Determining " + kymoTypes [t] + " results");
-				this.saveKymographResults(outputFolder, now, results, kymoTypes [t]);
+				this.saveKymographResults(outputFolder, now, results, kymoTypes [t], slicesPerCycle);
 				progressBar.setString("Determining " + kymoTypes [t] + " - frequency results");
 				this.saveFrequencyResults(outputFolder, now, results, kymoTypes [t] + "_f");
 				progressBar.setValue(15+(t+1)*5);
@@ -368,16 +391,20 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 			
 			//Save log file
 			this.logMessage("Processing done. A file (" + outputFolder.getName() + ") was created on the desktop.", LOG);
-			this.saveLog(outputFolder.getPath() + System.getProperty("file.separator") + "Log.txt");
-//		}catch (Exception e) {
-//			outputFolder.deleteOnExit();
-//			progressBar.setString("Sorry .. no file could be generated. An error occured during file reading / writing.");
-//			progressBar.setValue(100); 		
-//			progressBar.setStringPainted(true);
-//			progressBar.setForeground(Color.red);
-//			e.printStackTrace();
-//		}
-			
+			this.saveLog(outputFolder.getPath() + System.getProperty("file.separator") + "Log.txt");			
+		}catch (Exception e) {
+			outputFolder.deleteOnExit();
+			progressBar.setString("Sorry .. no file could be generated. An error occured during file reading / writing.");
+			progressBar.setValue(100); 		
+			progressBar.setStringPainted(true);
+			progressBar.setForeground(Color.red);
+			String out = "";
+			for(int err = 0; err < e.getStackTrace().length; err++){
+				out += " \n " + e.getStackTrace()[err].toString();
+			}
+			this.logMessage("Sorry .. no file could be generated. An error occured during file reading / writing:\n" 
+					+ e.getCause() + "\n" + out, ERROR);
+		}			
 		results.clear();
 		System.gc();
 		if(errorsAvailable){
@@ -434,7 +461,11 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 				bw.close();
 				fw.close();	
 			} catch (IOException e) {
-				this.logMessage("no results list generated - IOException", NOTIF);
+				String out = "";
+				for(int err = 0; err < e.getStackTrace().length; err++){
+					out += " \n " + e.getStackTrace()[err].toString();
+				}
+				this.logMessage("no results list generated - IOException:\n" + out, NOTIF);				
 			}		
 		}
 	}
@@ -512,7 +543,11 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 					bw.close();
 					fw.close();	
 				} catch (IOException e) {
-					this.logMessage("no results list generated - IOException", NOTIF);
+					String out = "";
+					for(int err = 0; err < e.getStackTrace().length; err++){
+						out += " \n " + e.getStackTrace()[err].toString();
+					}
+					this.logMessage("no results list generated - IOException:\n" + out, NOTIF);			
 				}
 			}
 		}
@@ -593,7 +628,11 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 					bw.close();
 					fw.close();	
 				} catch (IOException e) {
-					this.logMessage("no results list generated - IOException", NOTIF);
+					String out = "";
+					for(int err = 0; err < e.getStackTrace().length; err++){
+						out += " \n " + e.getStackTrace()[err].toString();
+					}
+					this.logMessage("no results list generated - IOException:\n" + out, NOTIF);			
 				}
 			}
 		}
@@ -650,11 +689,11 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 					for(int j = 0; j < kymoRes [0].length; j++){
 						for(int k = 0; k < 3; k++){
 							if(kymoRes[k][j] != Float.NEGATIVE_INFINITY
-									&& kymoRes[k][j] != Float.NaN){
+									&& !Float.isNaN(kymoRes[k][j])){
 								pos = (int)Math.round(j * results.get(i).timePerFrame / maxTimePerFrame);
 								kymoDataArray [k][i][pos][0] = kymoDataArray [k][i][pos][0] + kymoRes [k][j];
 								kymoDataArray [k][i][pos][1] = kymoDataArray [k][i][pos][1] + 1.0f;
-							}							
+							}
 						}
 					}
 				}
@@ -723,7 +762,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 						if(ct > 1){
 							appendTxt += constants.df6US.format(tools.getMinimumWithinRange(collArray, 0, ct-1));
 						}else if(ct == 1){
-							appendTxt += constants.df6US.format(collArray[ct]);
+							appendTxt += constants.df6US.format(collArray[0]);
 						}
 					}
 					bw.write(appendTxt + newLine);
@@ -744,7 +783,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 						if(ct > 1){
 							appendTxt += constants.df6US.format(tools.getMaximumWithinRange(collArray, 0, ct-1));
 						}else if(ct == 1){
-							appendTxt += constants.df6US.format(collArray[ct]);
+							appendTxt += constants.df6US.format(collArray[0]);
 						}
 					}
 					bw.write(appendTxt + newLine);	
@@ -757,6 +796,9 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 						for(int j = 0; j < lastPos; j++){
 							if(kymoDataArray[k][i][j][1] != 0.0f){
 								collArray[ct] = kymoDataArray[k][i][j][0] / kymoDataArray[k][i][j][1];
+//								if(Float.isNaN(collArray[ct])){
+//									System.out.println(" " + collArray[ct] + ":" + k + "." + i + "." + j + ":" + kymoDataArray[k][i][j][0] + ":" + kymoDataArray[k][i][j][1]);
+//								}
 								ct++;
 							}	
 						}												
@@ -765,7 +807,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 						if(ct > 1){
 							appendTxt += constants.df6US.format(tools.getAverageOfRange(collArray, 0, ct-1));
 						}else if(ct == 1){
-							appendTxt += constants.df6US.format(collArray[ct]);
+							appendTxt += constants.df6US.format(collArray[0]);
 						}
 					}
 					bw.write(appendTxt + newLine);	
@@ -786,7 +828,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 						if(ct > 1){
 							appendTxt += constants.df6US.format(tools.getMedianOfRange(collArray, 0, ct-1));
 						}else if(ct == 1){
-							appendTxt += constants.df6US.format(collArray[ct]);
+							appendTxt += constants.df6US.format(collArray[0]);
 						}
 					}
 					bw.write(appendTxt + newLine);	
@@ -806,16 +848,20 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 					bw.close();
 					fw.close();	
 				} catch (IOException e) {
-					this.logMessage("no results list generated - IOException", NOTIF);
+					String out = "";
+					for(int err = 0; err < e.getStackTrace().length; err++){
+						out += " \n " + e.getStackTrace()[err].toString();
+					}
+					this.logMessage("no results list generated - IOException:\n" + out, NOTIF);			
 				}
 			}
 		}
 		System.gc();
 	}
 	
-	private void saveKymographResults(File file, Date d, ArrayList<Result> results, String keySeq){
-		/*
-		 * Replace this method by a method that reads the corresponding text file using BufferedReader and FileReader
+	private void saveKymographResults(File file, Date d, ArrayList<Result> results, String keySeq, int [] slicesPerCycle){
+		/**
+		 * TODO Replace this method by a method that reads the corresponding text file using BufferedReader and FileReader
 		 * ***/
 		
 		//Retrieve results
@@ -824,7 +870,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 		double maxCal = 0.0;
 //		double minCal = Double.MAX_VALUE;
 		for(int i = 0; i < results.size(); i++){
-			float kymoRes [][] = results.get(i).getKymoResults(keySeq);
+			float kymoRes [][] = results.get(i).getKymoResults(keySeq, slicesPerCycle[i]);
 			if(results.get(i).valid){
 				if(maxAl < kymoRes.length * results.get(i).calibration){
 					maxAl = (float)(kymoRes.length * results.get(i).calibration);
@@ -838,6 +884,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 			}
 			kymoData.add(kymoRes);
 		}
+//		System.out.println("maxCal" + maxCal + " cal of 0: " + results.get(0).calibration);
 				
 		int maxPos = (int)Math.round(maxAl/maxCal)+1;
 		float [][][][] kymoDataArray = new float [kymoData.size()][maxPos][4][2];
@@ -857,8 +904,10 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 					kymoRes = kymoData.get(i);
 					for(int j = 0; j < kymoRes.length; j++){
 						for(int k = 0; k < 4; k++){
-							if(kymoRes[j][k] != Float.NEGATIVE_INFINITY){
+							if(kymoRes[j][k] != Float.NEGATIVE_INFINITY
+									&& !Float.isNaN(kymoRes[j][k])){
 								pos = (int)Math.round(j * results.get(i).calibration/maxCal);
+//								if(keySeq == "cAng" && k==3) System.out.println("other " + k + ": " + pos + ":	" + kymoRes [j][k]);	
 								kymoDataArray [i][pos][k][0] = kymoDataArray [i][pos][k][0] + kymoRes [j][k];
 								kymoDataArray [i][pos][k][1] = kymoDataArray [i][pos][k][1] + 1.0f;
 							}							
@@ -919,6 +968,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 						for(int i = 0; i < results.size(); i++){
 							appendTxt += "	";
 							if(kymoDataArray[i][j][k][1] != 0.0f){
+//								if(keySeq == "cAng" && k==3) System.out.println("out " + constants.df6US.format(kymoDataArray[i][j][k][0] / kymoDataArray[i][j][k][1]));
 								appendTxt += constants.df6US.format(kymoDataArray[i][j][k][0] / kymoDataArray[i][j][k][1]);
 							}								
 						}
@@ -928,12 +978,22 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 					bw.close();
 					fw.close();	
 				} catch (IOException e) {
-					this.logMessage("no results list generated - IOException", NOTIF);
+					String out = "";
+					for(int err = 0; err < e.getStackTrace().length; err++){
+						out += " \n " + e.getStackTrace()[err].toString();
+					}
+					this.logMessage("no results list generated - IOException:\n" + out, NOTIF);			
 				}
 			}
 			
 			//save amplitude text file
-			{
+			/**
+			 * Method changed from version 1.0.3 on
+			 * Until version 1.0.3: Amplitude = Max - Min
+			 * From version 1.0.3 on: make chunks of 3 main beat cycles and determine min + max in each of them.
+			 * Take the median max and the median min value of all chunks.
+			 * */
+			{				
 				fileRes = new File(file.getPath() + System.getProperty("file.separator")
 				+ keySeq + "_" + KYMOSAVE [4] + ".txt");
 				
@@ -972,8 +1032,12 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 					
 					bw.close();
 					fw.close();	
-				} catch (IOException e) {
-					this.logMessage("no results list generated - IOException", NOTIF);
+				}catch (IOException e) {
+					String out = "";
+					for(int err = 0; err < e.getStackTrace().length; err++){
+						out += " \n " + e.getStackTrace()[err].toString();
+					}
+					this.logMessage("no results list generated - IOException:\n" + out, NOTIF);			
 				}
 			}
 			
@@ -1018,7 +1082,11 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 						bw.close();
 						fw.close();	
 					} catch (IOException e) {
-						this.logMessage("no results list generated - IOException", NOTIF);
+						String out = "";
+						for(int err = 0; err < e.getStackTrace().length; err++){
+							out += " \n " + e.getStackTrace()[err].toString();
+						}
+						this.logMessage("no results list generated - IOException:\n" + out, NOTIF);			
 					}
 				}
 			}
@@ -1134,8 +1202,12 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 						
 						bw.close();
 						fw.close();	
-					} catch (IOException e) {
-						this.logMessage("no results list generated - IOException", NOTIF);
+					}catch (IOException e) {
+						String out = "";
+						for(int err = 0; err < e.getStackTrace().length; err++){
+							out += " \n " + e.getStackTrace()[err].toString();
+						}
+						this.logMessage("no results list generated - IOException:\n" + out, NOTIF);			
 					}
 				}
 			}
@@ -1183,9 +1255,11 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 				}			
 				pw.close();
 			}catch (IOException e) {
-				e.printStackTrace();
-//				IJ.error(e.getMessage());
-				this.logMessage(e.toString(),ERROR);
+				String out = "";
+				for(int err = 0; err < e.getStackTrace().length; err++){
+					out += " \n " + e.getStackTrace()[err].toString();
+				}				
+				this.logMessage("Error while saving log: " + e.getCause() + out,ERROR);
 			}
 		}		
 	}
@@ -1238,6 +1312,5 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 			logList.setListData(listData);
 		}		
 		bgPanel.updateUI();
-	
 	}
 }

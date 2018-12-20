@@ -2,7 +2,7 @@ package spqEval.pdf;
 
 /** 
 ===============================================================================
-* SpermQEvaluator_.java Version 1.0.2
+* SpermQEvaluator_.java Version 1.0.3
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -130,8 +130,13 @@ public class HeadPositionTracker extends PDFPage{
 			PDFTools.insertTextBoxUpperY(cts, iX0 - lDescSpacer - pdt.space, iY0 + (iH/2), "µm", pdt.subDescSize);	
 		}
 		catch(Exception e){
-			System.out.println(e.getMessage());
+			String out = "";
+			for(int err = 0; err < e.getStackTrace().length; err++){
+				out += " \n " + e.getStackTrace()[err].toString();
+			}
 			System.out.println("error! - caught exception while inserting content to PDF");
+			System.out.println(e.getCause());
+			System.out.println(out);
 		}		
 	}
 	

@@ -2,7 +2,7 @@ package spqEval.pdf;
 
 /** 
 ===============================================================================
-* SpermQEvaluator_.java Version 1.0.2
+* SpermQEvaluator_.java Version 1.0.3
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -56,10 +56,10 @@ public class HeadResultsPlot extends PDFPlot {
 	double yBaseValueT;
 	double yBaseValueV;
 	float yBaseValueH = 0.25f;
-	double arcLenghtµm;
+	double arcLengthMicron;
 	
-	static final String nameOfVelocityPlot = "Velocity_plot.png";
 	static final String nameOfThetaPlot = "Theta_plot.png";
+	static final String nameOfVeloPlot = "Velocity_plot.png";
 	static final String nameOfHRIMaxPlot = "HRIMax_plot.png";
 	String thetaPlotPath, velocityPlotPath, hriMaxPlotPath;
 		
@@ -79,8 +79,8 @@ public class HeadResultsPlot extends PDFPlot {
 		plotHeight = height;
 		x = posX;
 		y = posY;
-		thetaPlotPath = targetPath + nameOfVelocityPlot;
-		velocityPlotPath = targetPath + nameOfThetaPlot;
+		thetaPlotPath = targetPath + nameOfThetaPlot;
+		velocityPlotPath = targetPath + nameOfVeloPlot;
 		hriMaxPlotPath = targetPath + nameOfHRIMaxPlot;
 		
 		desc = "upper panel: orientation of head-midpiece axis in space, middle panel: velocity of head in space, bottom panel: rolling";
@@ -101,12 +101,12 @@ public class HeadResultsPlot extends PDFPlot {
 	
 	protected void renderPlot() {
 		
-		Plot plot1 = new Plot(plotWidth*pdt.resolution/nOfPlots, plotHeight*pdt.resolution/nOfPlots, thetaPlotPath, nameOfThetaPlot, theta);
+		Plot plot1 = new Plot(plotWidth*pdt.resolution/nOfPlots, plotHeight*pdt.resolution/nOfPlots, thetaPlotPath, nameOfVeloPlot, theta);
 		plot1.setLineColor(thetaColors);
 		plot1.setRanges(xMin, yMinT, xMax, yMaxT);
 		plot1.renderPlot(false, true, pdt.plotLineWidthFactor*pdt.resolution/nOfPlots);
 		
-		Plot plot2 = new Plot(plotWidth*pdt.resolution/nOfPlots, plotHeight*pdt.resolution/nOfPlots, velocityPlotPath,  nameOfVelocityPlot , velocity);
+		Plot plot2 = new Plot(plotWidth*pdt.resolution/nOfPlots, plotHeight*pdt.resolution/nOfPlots, velocityPlotPath,  nameOfThetaPlot , velocity);
 		plot2.setLineColor(velocityColors);
 		plot2.setRanges(xMin, yMinV, xMax, yMaxV);
 		plot2.renderPlot(false, true, pdt.plotLineWidthFactor*pdt.resolution/nOfPlots);
@@ -123,7 +123,7 @@ public class HeadResultsPlot extends PDFPlot {
 		velocity = new XYSeries ("velocity_plot");
 		hri = new XYSeries ("hriMax_plot");
 
-		Result r = new Result(PDFPage.sourcePath, 5);
+		Result r = new Result(PDFPage.sourcePath,coverageThreshold);
 
 		float [][] rawData = r.getHeadResults();
 		
@@ -132,14 +132,13 @@ public class HeadResultsPlot extends PDFPlot {
 		int arrayBound = (int) xMax;
 		if(arrayBound > rawData[0].length) arrayBound = rawData[0].length;		
 		int i;
-		rawData[2] = PDFTools.normalizeValuesFloat(rawData[2]);
+		rawData[2] = PDFTools.normalizeValuesFloatAccordingToRange(rawData[2], 0, arrayBound);
 		for (i = 0; i < arrayBound; i++) {
 			if(rawData[0][i] > Float.NEGATIVE_INFINITY) {
 				theta.add(i, rawData[0][i]);
 			}
 			if(rawData[1][i] > Float.NEGATIVE_INFINITY) {
 				velocity.add(i, rawData[1][i]);
-//				System.out.println(rawData[1][i]);
 			}
 			if(rawData[2][i] > Float.NEGATIVE_INFINITY) {
 				hri.add(i, rawData[2][i]);
@@ -215,8 +214,13 @@ public class HeadResultsPlot extends PDFPlot {
 			
 		}
 		catch(Exception e){
-			System.out.println(e.getMessage());
 			System.out.println("error! - caught Exception !");
+			System.out.println(e.getCause());
+			String out = "";
+			for(int err = 0; err < e.getStackTrace().length; err++){
+				out += " \n " + e.getStackTrace()[err].toString();
+			}
+			System.out.println(out);
 		}
 	}
 	
@@ -311,7 +315,7 @@ public class HeadResultsPlot extends PDFPlot {
 		float yCorrectionNumbers = pdt.subDescSize/2;
 		
 		int numberOfIndicators = (int) (yMaxH / yBaseValueH);
-		
+		if(numberOfIndicators < 1) numberOfIndicators = 1;
 		for(int z = 0; z <= numberOfIndicators; z++) {
 			try {
 				y = hY0 + hH * (numberOfIndicators - z)/numberOfIndicators;

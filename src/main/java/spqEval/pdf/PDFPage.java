@@ -2,7 +2,7 @@ package spqEval.pdf;
 
 /** 
 ===============================================================================
-* SpermQEvaluator_.java Version 1.0.2
+* SpermQEvaluator_.java Version 1.0.3
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -53,7 +53,7 @@ public class PDFPage {
 	
 	static String sourcePath, expName, rawTargetPath, targetPath;	
 	static byte ID = 0;
-	static double imageFreq, timeOfStack, slicesPerCycle, beatPeriodTime, numberOfFrames, xyCalibration, maxArcLenght, totalTime;
+	static double imageFreq, timeOfStack, slicesPerCycle, beatPeriodTime, numberOfFrames, xyCalibration, maxArcLenght, totalTime, coverageThreshold;
 	static double zMin, zMax, nZMin, nZMax;
 	static PDDocument doc;
 	static PDPage page;
@@ -77,7 +77,9 @@ public class PDFPage {
 	
 	int undefinedColor = 0x00E000;
 	
-	public PDFPage(String sourcePath, String expName, String targetPath){	
+	public PDFPage(String sourcePath, String expName, String targetPath, double threshold){	
+		coverageThreshold = threshold;
+		
 		pdfName = expName + "_results.pdf";
 		PDFPage.rawTargetPath = targetPath;
 		PDFPage.targetPath = targetPath + "files_for_PDF" + System.getProperty("file.separator"); //subfolder for the generated data
@@ -218,7 +220,7 @@ public class PDFPage {
 					break scanningForTheta;
 				}
 			}		
-			slicesPerCycle = beatPeriodTime/(1/imageFreq);			
+			slicesPerCycle = beatPeriodTime/(1/imageFreq);	
 			fr.close();
 			br.close();
 		} catch (Exception e) {
@@ -305,4 +307,7 @@ public class PDFPage {
 			
 		}
 	}	
+	public double getSlicesPerCycle(){
+		return slicesPerCycle;
+	}
 }

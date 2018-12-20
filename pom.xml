@@ -12,7 +12,7 @@
 <!-- Plugin Information -->
 	<groupId>IIIImaging</groupId>
 	<artifactId>SpermQ_Evaluator</artifactId>
-	<version>1.0.2</version>
+	<version>1.0.3</version>
 	<name>SpermQ Evaluator</name>
 	<description>Evaluation tool for SpermQ results folders.</description>
  	<inceptionYear>2017</inceptionYear>	
@@ -64,8 +64,6 @@
             <organization>University of Bonn - Institue of Innate immunity - Biophysical Imaging</organization>
             <organizationUrl>http://www.iii.uni-bonn.de/en/wachten_lab/</organizationUrl>
             <roles>
-                <role>founder</role>
-                <role>lead</role>
                 <role>developer</role>
                 <role>debugger</role>
                 <role>reviewer</role>

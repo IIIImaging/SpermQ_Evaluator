@@ -2,7 +2,7 @@ package spqEval.pdf;
 
 /** 
 ===============================================================================
-* SpermQEvaluator_.java Version 1.0.2
+* SpermQEvaluator_.java Version 1.0.3
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -204,8 +204,8 @@ public class ZFreqFFTPlot extends PDFPlot {
 		int x2 = pX0 - pdt.space*2;
 		float yCorrectionNumbers = pdt.subDescSize/2;
 		
-		int numberOfIndicators = (int) (yMaxPow / yBaseValuePow);
-		
+		int numberOfIndicators = (int) ((yMaxPow-yMinPow) / yBaseValuePow);
+//		System.out.println(yMaxPow + " vs " + yMinPow + " vs " + yBaseValuePow);
 		for(int z = 0; z <= numberOfIndicators; z++) {
 			try {
 				y = pY0 + pH * (numberOfIndicators - z)/numberOfIndicators;
@@ -214,7 +214,7 @@ public class ZFreqFFTPlot extends PDFPlot {
 				System.out.println("exception in addSideDesc");
 			}
 		}
-		PDFTools.insertTextBoxToRightBoundYCentrated(cts, x2, pY0 + yCorrectionNumbers, Integer.toString((int) (0)), pdt.subDescSize);
+		PDFTools.insertTextBoxToRightBoundYCentrated(cts, x2, pY0 + yCorrectionNumbers, Integer.toString((int) (yMinPow)), pdt.subDescSize);
 		PDFTools.insertTextBoxToRightBound(cts, x2, pY0 + pH + yCorrectionNumbers, Integer.toString((int) (yMaxPow)), pdt.subDescSize);
 		try {
 			cts.drawLine(pX0, pY0, pX0, pY0 + pH + pdt.lineWidth);
@@ -232,7 +232,7 @@ public class ZFreqFFTPlot extends PDFPlot {
 			xySeries [i] = new XYSeries(names[i]);
 		}
 
-		Result r = new Result(PDFPage.sourcePath, 5);
+		Result r = new Result(PDFPage.sourcePath, coverageThreshold);
 		data = r.getFreqResults("Z_f");
 
 		int arcL;
@@ -248,10 +248,10 @@ public class ZFreqFFTPlot extends PDFPlot {
 	}
 	
 	private void addValue(int id, int arcL) {
-		if(data[id][arcL][3] > 0) {
-			xySeries[id].add(arcL, data[id][arcL][3]);
+		if(data[id][arcL][3] != Float.NEGATIVE_INFINITY) {
+			xySeries[id].add(arcL*xyCalibration, data[id][arcL][3]);
 		}
-		else {
+		else{
 			highestUndefined = arcL;
 		}
 	}

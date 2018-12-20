@@ -2,7 +2,7 @@ package spqEval.pdf;
 
 /** 
 ===============================================================================
-* SpermQEvaluator_.java Version 1.0.2
+* SpermQEvaluator_.java Version 1.0.3
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -53,7 +53,7 @@ public class YPlot extends PDFPlot {
 	int highestUndefined;
 	int xBaseValue = 50;
 	double yBaseValueAv, yBaseValueRa;
-	double arcLenghtµm;
+	double arcLengthMicron;
 	
 	static final String nameOfAveragePlot = "Y_average_plot.png";
 	static final String nameOfRangePlot = "Y_range_plot.png";
@@ -113,8 +113,13 @@ public class YPlot extends PDFPlot {
 			cts.drawImage(averagePlot, aX0, aY0, aW, aH);			
 		}
 		catch(Exception e){
-			System.out.println(e.getMessage());
 			System.out.println("error! - caught Exception !");
+			System.out.println(e.getCause());
+			String out = "";
+			for(int err = 0; err < e.getStackTrace().length; err++){
+				out += " \n " + e.getStackTrace()[err].toString();
+			}
+			System.out.println(out);
 		}
 		addDescRange();
 		addDescAverage();
@@ -139,15 +144,16 @@ public class YPlot extends PDFPlot {
 		range = new XYSeries ("range_plot");
 		average = new XYSeries ("average_plot");
 
-		Result r = new Result(PDFPage.sourcePath, 5);
-		float [][] rawData = r.getKymoResults("Y");
+		Result r = new Result(PDFPage.sourcePath, coverageThreshold);
+		float [][] rawData = r.getKymoResults("Y",(int)slicesPerCycle);
 
 		int arcL;
 		for (arcL = 0; arcL < rawData.length; arcL++) {
-			if(rawData[arcL][0] > Float.NEGATIVE_INFINITY && rawData[arcL][1] > Float.NEGATIVE_INFINITY) {
+			if(rawData[arcL][0] > Float.NEGATIVE_INFINITY && rawData[arcL][1] > Float.NEGATIVE_INFINITY
+					 && !Float.isNaN(rawData[arcL][0]) && !Float.isNaN(rawData[arcL][1])) {
 				range.add(arcL, rawData[arcL][1] - rawData[arcL][0]);
 			}
-			if(rawData[arcL][2] > Float.NEGATIVE_INFINITY) {
+			if(rawData[arcL][3] > Float.NEGATIVE_INFINITY && !Float.isNaN(rawData[arcL][3])) {
 				average.add(arcL, rawData[arcL][3]);
 			}
 		}
@@ -177,7 +183,7 @@ public class YPlot extends PDFPlot {
 		double absoluteArcLenght = xInUM;
 		xInUM = PDFTools.getNextMultipleOf(xBaseValue, xInUM);		
 		xMax = (xMax/(absoluteArcLenght / xInUM));
-		this.arcLenghtµm = xInUM;
+		this.arcLengthMicron = xInUM;
 		
 		yBaseValueAv = PDFTools.getBaseValue(yMaxAv-yMinAv, 4, 0.25,1,2,5);		
 		yMaxAv = PDFTools.getNextMultipleOf(yBaseValueAv, yMaxAv);
@@ -199,14 +205,14 @@ public class YPlot extends PDFPlot {
 		
 		int y0 = aY0 - pdt.space;
 		float x;
-		float numberOfIndicators = (int) ( arcLenghtµm/ xBaseValue);
+		float numberOfIndicators = (int) (arcLengthMicron/ xBaseValue);
 		double desValue;
 		
 		for(int z = 0; z <= numberOfIndicators; z++) {
 			try {
 				x = aX0 + aW * z/numberOfIndicators;
 				cts.drawLine(x, y0, x, aY0);
-				desValue = (z/numberOfIndicators * arcLenghtµm);
+				desValue = (z/numberOfIndicators * arcLengthMicron);
 				PDFTools.insertTextBoxXCentered(cts, x, y0 - pdt.space, Integer.toString((int) (desValue)) , pdt.subDescSize);
 			} catch (IOException e) {
 				System.out.println("exception in addSideDesc");

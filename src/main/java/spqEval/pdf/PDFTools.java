@@ -2,7 +2,7 @@ package spqEval.pdf;
 
 /** 
 ===============================================================================
-* SpermQEvaluator_.java Version 1.0.2
+* SpermQEvaluator_.java Version 1.0.3
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -252,16 +252,46 @@ public class PDFTools {
 	
 	public static float [] normalizeValuesFloat(float [] input) {
 		float min = Float.MAX_VALUE, max = Float.MIN_VALUE;
-		for(Float d : input) {
-			if(d > max) {
-				max = d;
+		for(int i = 0; i < input.length; i++) {
+			if(input[i] == Float.NEGATIVE_INFINITY){
+				continue;
 			}
-			if(d < min) {
-				min =d;
+			if(input[i] > max) {
+				max = input[i];
+			}
+			if(input[i] < min) {
+				min = input[i];
 			}
 		}
 		float range = max-min;
 		for(int i = 0; i < input.length; i++) {
+			if(input[i] == Float.NEGATIVE_INFINITY) continue;
+			input[i] = (input [i] - min)/(range);
+		}
+		return input;
+	}
+	
+	/**
+	 * normalizes input values, so that the values range between 0 and 1 
+	 * - only for a range of values in the array.
+	 * @return a float array with the normalized values between 0 and 1
+	 */	
+	public static float [] normalizeValuesFloatAccordingToRange(float [] input, int minIndex, int maxIndex) {
+		float min = Float.MAX_VALUE, max = Float.MIN_VALUE;
+		for(int i = minIndex; i < maxIndex; i++) {
+			if(input[i] == Float.NEGATIVE_INFINITY){
+				continue;
+			}
+			if(input[i] > max) {
+				max = input[i];
+			}
+			if(input[i] < min) {
+				min = input[i];
+			}
+		}
+		float range = max-min;
+		for(int i = 0; i < input.length; i++) {
+			if(input[i] == Float.NEGATIVE_INFINITY) continue;
 			input[i] = (input [i] - min)/(range);
 		}
 		return input;
