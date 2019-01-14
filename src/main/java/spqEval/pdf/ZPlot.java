@@ -2,7 +2,7 @@ package spqEval.pdf;
 
 /** 
 ===============================================================================
-* SpermQEvaluator_.java Version 1.0.3
+* SpermQEvaluator_.java Version 1.0.4
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -147,18 +147,18 @@ public class ZPlot extends PDFPlot {
 		average = new XYSeries ("average_plot");
 
 		Result r = new Result(PDFPage.sourcePath, coverageThreshold);
-		float [][] rawData = r.getKymoResults("Z",(int)slicesPerCycle);
+		double [][] rawData = r.getFlagellarParameterResult("Z",(int)slicesPerCycle);	//TODO
 
 		int arcL;
 		for (arcL = 0; arcL < rawData.length; arcL++) {
-			if(rawData[arcL][0] != Float.NEGATIVE_INFINITY && rawData[arcL][1] > Float.NEGATIVE_INFINITY  
-					&& !Float.isNaN(rawData[arcL][0])  && !Float.isNaN(rawData[arcL][1])) {
+			if(rawData[arcL][0] != Double.NEGATIVE_INFINITY && rawData[arcL][1] > Double.NEGATIVE_INFINITY  
+					&& !Double.isNaN(rawData[arcL][0])  && !Double.isNaN(rawData[arcL][1])) {
 				range.add(arcL, rawData[arcL][1] - rawData[arcL][0]);
 //				System.out.println("incl min max " + arcL + ":	" + rawData[arcL][0] + " / " + rawData[arcL][1]);
 			}else{
 //				System.out.println("EXCL min max " + arcL + ":	" + rawData[arcL][0] + " / " + rawData[arcL][1]);
 			}
-			if(rawData[arcL][3] != Float.NEGATIVE_INFINITY  && !Float.isNaN(rawData[arcL][3])) {
+			if(rawData[arcL][3] != Double.NEGATIVE_INFINITY  && !Double.isNaN(rawData[arcL][3])) {
 //				System.out.println("incl avg " + arcL + ":	" + rawData[arcL][3]);
 				average.add(arcL, rawData[arcL][3]);
 			}else{

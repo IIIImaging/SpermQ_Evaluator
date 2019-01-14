@@ -2,7 +2,7 @@ package spqEval.lut;
 
 /** 
 ===============================================================================
-* SpermQEvaluator_.java Version 1.0.3
+* SpermQEvaluator_.java Version 1.0.4
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
