@@ -1,7 +1,7 @@
 ﻿package spqEval;
 
 /** ===============================================================================
-* SpermQEvaluator_.java Version 1.0.3
+* SpermQEvaluator_.java Version 1.0.4
 * 
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -57,12 +57,12 @@ import spqEval.tools.constants;
 import spqEval.tools.tools;
 
 public class Main extends javax.swing.JFrame implements ActionListener {
-	private static final String version = "1.0.3";
+	private static final String version = "1.0.4_preliminary";
 	
 	private static final long serialVersionUID = 1L;	
 	
 	private static String referenceLine = "This file was generated using SpermQ_Evaluator,"
-			+ " a java application by Jan Niklas Hansen (\u00a9 2017 - 2018)"
+			+ " a java application by Jan Niklas Hansen (\u00a9 2017 - 2019)"
 			+ " (for credits see: https://github.com/IIIImaging/SpermQ_Evaluator).";
 	
 	public static final int ERROR = 0;
@@ -74,13 +74,13 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 	static final SimpleDateFormat NameDateFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
 	static final SimpleDateFormat FullDateFormatter = new SimpleDateFormat("yyyy-MM-dd	HH:mm:ss");
 		
-	static final String [] HEADRESULTS = {"angle theta", "head velocity (in 2D)", "max Intensity in head"};
+	static final String [] HEADRESULTS = {"angle theta", "head velocity (in 2D)", "max Intensity in head", "head coordinates"};
 	static final String [] KYMORESULTS = {"Results Minimum:", "Results Maximum:", 
 			"Results Median:", "Results Average:", "Results Amplitude:"};
 	static final String [] KYMOFREQRESULTS = {"primary frequency", "peak height of primary frequency",
 			"secondary frequency", "peak height of secondary frequency",
 			"center-of-mass of frequency spectrum"};
-	static final String [] HEADSAVE = {"Th2D", "HV", "HMaxI"};
+	static final String [] HEADSAVE = {"Th2D", "HV", "HMaxI", "HCoord"};
 	static final String [] KYMOSAVE = {"min", "max", "medi", "avg", "ampl"};
 	static final String [] KYMOSAVEFREQ = {"f1", "a1", "f2","a2", "com"};
 			
@@ -472,9 +472,9 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 	
 	private void saveThetaFreqResults(File file, Date d, ArrayList<Result> results){
 		//save Theta Frequency Results File		
-		float [][][] resultsArray = new float [results.size()][5][4];	// results, freqResultsType, min/max/avg/medi
+		double [][][] resultsArray = new double [results.size()][5][4];	// results, freqResultsType, min/max/avg/medi
 		{
-			float [][] headFreqResult;
+			double [][] headFreqResult;
 			for(int i = 0; i < results.size(); i++){
 				headFreqResult = results.get(i).getHeadFrequencyResults("Th2D");
 				for(int k = 0; k < 5; k++){
@@ -492,7 +492,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 					}
 					else{
 						for(int l = 0; l < 4; l++){
-							resultsArray [i][k][l] = Float.NEGATIVE_INFINITY;
+							resultsArray [i][k][l] = Double.NEGATIVE_INFINITY;
 						}
 					}
 				}
@@ -533,7 +533,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 						appendTxt = KYMORESULTS [l];	
 						for(int i = 0; i < results.size(); i++){
 							appendTxt += "	";
-							if(resultsArray[i][k][l] != Float.NEGATIVE_INFINITY){
+							if(resultsArray[i][k][l] != Double.NEGATIVE_INFINITY){
 								appendTxt += constants.df6US.format(resultsArray[i][k][l]);
 							}
 						}
@@ -556,9 +556,9 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 	
 	private void saveHRIFreqResults(File file, Date d, ArrayList<Result> results){
 		//save Theta Frequency Results File		
-		float [][][] resultsArray = new float [results.size()][5][4];	// results, freqResultsType, min/max/avg/medi
+		double [][][] resultsArray = new double [results.size()][5][4];	// results, freqResultsType, min/max/avg/medi
 		{
-			float [][] headFreqResult;
+			double [][] headFreqResult;
 			for(int i = 0; i < results.size(); i++){
 				headFreqResult = results.get(i).getHeadFrequencyResults("HRMaxInt");
 				for(int k = 0; k < 5; k++){
@@ -577,7 +577,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 					}
 					else{
 						for(int l = 0; l < 4; l++){
-							resultsArray [i][k][l] = Float.NEGATIVE_INFINITY;
+							resultsArray [i][k][l] = Double.NEGATIVE_INFINITY;
 						}
 					}
 				}
@@ -618,7 +618,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 						appendTxt = KYMORESULTS [l];	
 						for(int i = 0; i < results.size(); i++){
 							appendTxt += "	";
-							if(resultsArray[i][k][l] != Float.NEGATIVE_INFINITY){
+							if(resultsArray[i][k][l] != Double.NEGATIVE_INFINITY){
 								appendTxt += constants.df6US.format(resultsArray[i][k][l]);
 							}
 						}
@@ -668,14 +668,13 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 			kymoData.add(kymoRes);
 		}
 		
-		
 		int maxPos = (int)Math.round(maxFrameNr/maxTimePerFrame)+1;		
 //		System.out.println("" + maxAl + " / " + maxCal + " = " + maxPos);
-		float [][][][] kymoDataArray = new float [3][kymoData.size()][maxPos][2];
+		float [][][][] kymoDataArray = new float [6][kymoData.size()][maxPos][2];
 		{
 			for(int i = 0; i < kymoData.size(); i++){
 				for(int j = 0; j < maxPos; j++){
-					for(int k = 0; k < 3; k++){
+					for(int k = 0; k < 6; k++){
 						kymoDataArray [k][i][j][0] = 0.0f;
 						kymoDataArray [k][i][j][1] = 0.0f;
 					}
@@ -687,7 +686,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 				if(results.get(i).valid){
 					kymoRes = kymoData.get(i);
 					for(int j = 0; j < kymoRes [0].length; j++){
-						for(int k = 0; k < 3; k++){
+						for(int k = 0; k < 6; k++){
 							if(kymoRes[k][j] != Float.NEGATIVE_INFINITY
 									&& !Float.isNaN(kymoRes[k][j])){
 								pos = (int)Math.round(j * results.get(i).timePerFrame / maxTimePerFrame);
@@ -707,7 +706,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 		int lastPos = maxPos;
 		searching: for(int j = maxPos-1; j >=0 ; j--){
 			for(int i = 0; i < kymoDataArray [0].length; i++){
-				for(int k = 0; k < 3; k++){
+				for(int k = 0; k < 6; k++){
 					if(kymoDataArray [k][i][j][1] != 0.0f){
 						lastPos = j+1;
 						break searching;
@@ -716,6 +715,8 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 			}
 		}
 		
+		saveHeadCoordinates(file, d, kymoDataArray, results, lastPos, maxTimePerFrame);	//TODO
+				
 		File fileRes;
 		FileWriter fw;
 		BufferedWriter bw;
@@ -859,21 +860,85 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 		System.gc();
 	}
 	
+	private void saveHeadCoordinates(File file, Date d, float [][][][] kymoDataArray, ArrayList<Result> results, int lastPos, double maxTimePerFrame){
+		File fileRes;
+		FileWriter fw;
+		BufferedWriter bw;
+		
+		fileRes = new File(file.getPath() + System.getProperty("file.separator")
+		+ HEADSAVE [3] + ".txt");
+		
+		try {
+			if (!fileRes.exists()) {
+				fileRes.createNewFile();
+			}	
+			fw = new FileWriter(fileRes.getAbsoluteFile());
+			bw = new BufferedWriter(fw);
+			
+			bw.write(referenceLine + newLine);
+			bw.write("Date of processing:	" + FullDateFormatter.format(d) + newLine);
+			bw.write(newLine);
+			bw.write("This file contains the kymograph results for the parameter " + HEADRESULTS [3] + ":" + newLine);
+			String appendTxt = "";
+			for(int i = 0; i < results.size(); i++){
+				appendTxt += "	" + results.get(i).directory.substring(
+						results.get(i).directory.lastIndexOf(
+								System.getProperty("file.separator"))+1)
+						+ "		";
+			}
+			bw.write(appendTxt + newLine);
+			
+			appendTxt = "time";
+			for(int i = 0; i < results.size(); i++){
+				appendTxt += "	X	Y	Z (fit width)";
+			}
+			bw.write(appendTxt + newLine);
+			
+			for(int j = 0; j < lastPos; j++){
+				appendTxt = "" + constants.df6US.format(j*maxTimePerFrame);
+				for(int i = 0; i < results.size(); i++){
+					appendTxt += "	";
+					if(kymoDataArray[3][i][j][1] != 0.0f){
+						appendTxt += constants.df6US.format(kymoDataArray[3][i][j][0] / kymoDataArray[3][i][j][1]);
+					}
+					appendTxt += "	";
+					if(kymoDataArray[4][i][j][1] != 0.0f){
+						appendTxt += constants.df6US.format(kymoDataArray[4][i][j][0] / kymoDataArray[4][i][j][1]);
+					}
+					appendTxt += "	";
+					if(kymoDataArray[5][i][j][1] != 0.0f){
+						appendTxt += constants.df6US.format(kymoDataArray[5][i][j][0] / kymoDataArray[5][i][j][1]);
+					}
+				}
+				bw.write(appendTxt + newLine);					
+			}
+			bw.close();
+			fw.close();	
+		} catch (IOException e) {
+			String out = "";
+			for(int err = 0; err < e.getStackTrace().length; err++){
+				out += " \n " + e.getStackTrace()[err].toString();
+			}
+			this.logMessage("no head coordinate file generated - IOException:\n" + out, NOTIF);			
+		}
+		 
+	}
+	
 	private void saveKymographResults(File file, Date d, ArrayList<Result> results, String keySeq, int [] slicesPerCycle){
 		/**
-		 * TODO Replace this method by a method that reads the corresponding text file using BufferedReader and FileReader
+		 * From version v1.0.4: use method "getFlagellarParameterResult" instead of "getKymoResult", which reads the corresponding text file using BufferedReader and FileReader -> higher precision + method relying on double and not float
 		 * ***/
 		
 		//Retrieve results
-		ArrayList<float[][]> kymoData = new ArrayList<float[][]>(results.size());
-		float maxAl = 0.0f;
+		ArrayList<double[][]> kymoData = new ArrayList<double[][]>(results.size());
+		double maxAl = 0.0;
 		double maxCal = 0.0;
 //		double minCal = Double.MAX_VALUE;
 		for(int i = 0; i < results.size(); i++){
-			float kymoRes [][] = results.get(i).getKymoResults(keySeq, slicesPerCycle[i]);
+			double kymoRes [][] = results.get(i).getFlagellarParameterResult(keySeq, slicesPerCycle[i]);
 			if(results.get(i).valid){
 				if(maxAl < kymoRes.length * results.get(i).calibration){
-					maxAl = (float)(kymoRes.length * results.get(i).calibration);
+					maxAl = (double)(kymoRes.length * results.get(i).calibration);
 				}
 				if(maxCal < results.get(i).calibration){
 					maxCal = results.get(i).calibration;
@@ -887,7 +952,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 //		System.out.println("maxCal" + maxCal + " cal of 0: " + results.get(0).calibration);
 				
 		int maxPos = (int)Math.round(maxAl/maxCal)+1;
-		float [][][][] kymoDataArray = new float [kymoData.size()][maxPos][4][2];
+		double [][][][] kymoDataArray = new double [kymoData.size()][maxPos][4][2];
 		{
 			for(int i = 0; i < kymoData.size(); i++){
 				for(int j = 0; j < maxPos; j++){
@@ -897,15 +962,15 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 					}
 				}
 			}
-			float kymoRes [][];
+			double kymoRes [][];
 			int pos;
 			for(int i = 0; i < kymoData.size(); i++){
 				if(results.get(i).valid){
 					kymoRes = kymoData.get(i);
 					for(int j = 0; j < kymoRes.length; j++){
 						for(int k = 0; k < 4; k++){
-							if(kymoRes[j][k] != Float.NEGATIVE_INFINITY
-									&& !Float.isNaN(kymoRes[j][k])){
+							if(kymoRes[j][k] != Double.NEGATIVE_INFINITY
+									&& !Double.isNaN(kymoRes[j][k])){
 								pos = (int)Math.round(j * results.get(i).calibration/maxCal);
 //								if(keySeq == "cAng" && k==3) System.out.println("other " + k + ": " + pos + ":	" + kymoRes [j][k]);	
 								kymoDataArray [i][pos][k][0] = kymoDataArray [i][pos][k][0] + kymoRes [j][k];
