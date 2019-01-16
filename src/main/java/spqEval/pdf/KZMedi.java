@@ -2,7 +2,7 @@ package spqEval.pdf;
 
 /** 
 ===============================================================================
-* SpermQEvaluator_.java Version 1.0.4
+* SpermQEvaluator_.java Version 1.0.5
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -102,7 +102,7 @@ public class KZMedi extends PDFPage {
 		iW = imageBoxWidth;
 		iH = imageBoxHeight;
 		iX0 = x + desBW ;
-		iY0 = y - pdt.header - iH - pdt.subDescSize*2 - pdt.space * 3;
+		iY0 = y - 2 * pdt.header - iH - pdt.subDescSize*2 - pdt.space * 3;
 
 		bW = (int)(iW * relativeCalibrationBoxWidth);
 		bH = pdt.lutHeight;

@@ -2,7 +2,7 @@ package spqEval.pdf;
 
 /** 
 ===============================================================================
-* SpermQEvaluator_.java Version 1.0.4
+* SpermQEvaluator_.java Version 1.0.5
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -97,18 +97,20 @@ public class PDFPage {
 		readResults();
 		getMaxArcLength();
 		
-		int leftBound1 = 50;
+		int leftBound1 = 40;
 		int leftBound2 = 320;			//left bound of 2nd column
 		int height = 150;
 		int width = 170;
 		int upperBound = 730;
 		int space = height + 40;
+		int widthKymo = 180;
+			
+		new KCAngle(leftBound1, upperBound, 120, 280);
+		new KZMedi(leftBound1 + widthKymo, upperBound, 120, 280);
+		new KY(leftBound1 + 2*widthKymo , upperBound, 120, 280);
 		
-		new BeatCircleRepr(leftBound1, 750, 150);
-		new KCAngle(270, 750, 70, 140);
-		new KZMedi(leftBound1, 520, 70, 140);
-		new HeadPositionTracker(270, 500, 120);
-		new KY(leftBound1, 280, 70, 140);
+		new BeatCircleRepr(leftBound1+20, upperBound - 410, 180);	
+		new HeadPositionTracker(leftBound1 + 270, upperBound-410, 180);
 		
 		addPage();
 		
@@ -295,6 +297,7 @@ public class PDFPage {
 	private void addPageDesc() {
 		PDFTools.insertTextBoxUpperY(cts, 20, 780, expName, pdt.headerSize);
 		PDFTools.insertTextBoxUpperY(cts, 550, 780, Integer.toString(pageNumber), pdt.headerSize);	
+		PDFTools.insertTextBoxUpperY(cts, 20, 780-pdt.headerSize-pdt.space, pdt.sourcePath, pdt.subDescSize);	
 	}
 
 	private void save(String path) {

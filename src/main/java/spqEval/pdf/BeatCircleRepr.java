@@ -2,7 +2,7 @@ package spqEval.pdf;
 
 /** 
 ===============================================================================
-* SpermQEvaluator_.java Version 1.0.4
+* SpermQEvaluator_.java Version 1.0.5
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -91,7 +91,7 @@ public class BeatCircleRepr extends PDFPage{
 		iW = imageBoxSize;
 		iH = imageBoxSize;
 		iX0 = x + lDescSpacer;
-		iY0 = y - pdt.header - iH;
+		iY0 = y - pdt.header - pdt.space*2 - iH;
 
 		bW = (int)(iW *(1-2*cfX));
 		bH = pdt.lutHeight;

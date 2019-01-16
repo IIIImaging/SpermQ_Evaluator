@@ -2,7 +2,7 @@ package spqEval.pdf;
 
 /** 
 ===============================================================================
-* SpermQEvaluator_.java Version 1.0.4
+* SpermQEvaluator_.java Version 1.0.5
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -161,8 +161,7 @@ public class HeadResultsPlot extends PDFPlot {
 	private void setYCalibrationTheta() {
 		yBaseValueT = PDFTools.getBaseValue(yMaxT-yMinT, 3, 0.25,1,2,5);		
 		yMaxT = PDFTools.getNextMultipleOf(yBaseValueT, yMaxT);
-		yMinT = PDFTools.getNextMultipleOf(yBaseValueT, yMinT) - yBaseValueT;
-		
+		yMinT = PDFTools.getNextMultipleOf(yBaseValueT, yMinT) - yBaseValueT;		
 	}
 	
 	private void setYCalibrationHRI() {
@@ -210,8 +209,7 @@ public class HeadResultsPlot extends PDFPlot {
 			addDescTheta();
 			addDescVelocity();
 			addDescHRI();
-			addLowerDesc();
-			
+			addLowerDesc();			
 		}
 		catch(Exception e){
 			System.out.println("error! - caught Exception !");
@@ -296,8 +294,8 @@ public class HeadResultsPlot extends PDFPlot {
 				System.out.println("exception in addSideDesc");
 			}
 		}
-		PDFTools.insertTextBoxToRightBoundYCentrated(cts, x2, vY0 + yCorrectionNumbers, dFormat2.format(yMinV), pdt.subDescSize);
-		PDFTools.insertTextBoxToRightBound(cts, x2, vY0 + vH + yCorrectionNumbers, dFormat2.format(yMaxV), pdt.subDescSize);
+		PDFTools.insertTextBoxToRightBoundYCentrated(cts, x2, vY0 + yCorrectionNumbers, dFormat0.format(yMinV), pdt.subDescSize);
+		PDFTools.insertTextBoxToRightBound(cts, x2, vY0 + vH + yCorrectionNumbers, dFormat0.format(yMaxV), pdt.subDescSize);
 		try {
 			cts.drawLine(vX0, vY0, vX0, vY0 + vH + pdt.lineWidth);
 		} catch (IOException e) {

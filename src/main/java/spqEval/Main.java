@@ -1,7 +1,7 @@
 ﻿package spqEval;
 
 /** ===============================================================================
-* SpermQEvaluator_.java Version 1.0.4
+* SpermQEvaluator_.java Version 1.0.5
 * 
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -432,7 +432,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 		loadButton.setEnabled(true);
 		bgPanel.updateUI();
 	}
-	
+
 	private void saveResultsList(File file, Date d){
 		File fileRes;
 		FileWriter fw;
@@ -457,7 +457,9 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 					bw.write(filesToOpen.get(i).getPath().substring(0, 
 							filesToOpen.get(i).getPath().lastIndexOf(System.getProperty("file.separator")))
 							+ "	" + filesToOpen.get(i).getName() + newLine);
-				}
+					bw.append(newLine + "The file was Analyzed with the following SpermQ settings:" + newLine + newLine);
+					bw.write(readSettings(filesToOpen.get(i).getPath()));
+				}				
 				bw.close();
 				fw.close();	
 			} catch (IOException e) {
@@ -468,6 +470,23 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 				this.logMessage("no results list generated - IOException:\n" + out, NOTIF);				
 			}		
 		}
+	}
+	
+	private String readSettings(String path) {
+		String s = "";		
+		try {
+			FileReader fr = new FileReader(path + System.getProperty("file.separator") + "results.txt");
+			BufferedReader br = new BufferedReader(fr);
+			for(int i = 0; i < 32; i++) {
+				s = s + br.readLine() + newLine;
+			}
+			fr.close();
+			br.close();
+		}
+		catch(Exception e) {
+		}		
+		System.out.println(s);
+		return s;
 	}
 	
 	private void saveThetaFreqResults(File file, Date d, ArrayList<Result> results){
