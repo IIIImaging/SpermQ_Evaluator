@@ -1,7 +1,7 @@
 ﻿package spqEval;
 
 /** ===============================================================================
-* SpermQEvaluator_.java Version 1.0.5
+* SpermQEvaluator_.java Version 1.0.6
 * 
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -49,10 +49,7 @@ import java.util.LinkedList;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 
-import ij.IJ;
-import ij.ImagePlus;
 import spqEval.pdf.PDFPage;
-import spqEval.pdf.PDFTools;
 import spqEval.tools.constants;
 import spqEval.tools.tools;
 
