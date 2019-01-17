@@ -54,7 +54,7 @@ import spqEval.tools.constants;
 import spqEval.tools.tools;
 
 public class Main extends javax.swing.JFrame implements ActionListener {
-	private static final String version = "1.0.4";
+	private static final String version = "1.0.6";
 	
 	private static final long serialVersionUID = 1L;	
 	
