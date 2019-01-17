@@ -485,7 +485,6 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 		}
 		catch(Exception e) {
 		}		
-		System.out.println(s);
 		return s;
 	}
 	

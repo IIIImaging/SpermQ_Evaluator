@@ -235,7 +235,10 @@ public class PDFTools {
 	 */
 	
 	public static double getNextMultipleOf (double base, double value) {
-		if(value < 0) {
+		if(value%base < 0.001*value) {
+			return value;
+		}
+		else if(value < 0) {
 			double multiple = (int) (Math.abs(value)/base);
 			return (0-(multiple * base));
 		}

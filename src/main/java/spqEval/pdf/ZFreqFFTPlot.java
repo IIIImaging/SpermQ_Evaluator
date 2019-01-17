@@ -160,7 +160,7 @@ public class ZFreqFFTPlot extends PDFPlot {
 				x = pX0 + pW * z/numberOfIndicators;
 				cts.drawLine(x, y0, x, pY0);
 				desValue = (z/numberOfIndicators * xMaxFreq);
-				PDFTools.insertTextBoxXCentered(cts, x, y0 - pdt.space, Integer.toString((int) (desValue)) , pdt.subDescSize);
+				PDFTools.insertTextBoxXCentered(cts, x, y0 - pdt.space, Long.toString(Math.round(desValue)) , pdt.subDescSize);
 			} catch (IOException e) {
 				System.out.println("exception in addSideDesc");
 			}

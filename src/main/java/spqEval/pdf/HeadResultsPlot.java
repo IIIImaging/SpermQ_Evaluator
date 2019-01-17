@@ -87,12 +87,9 @@ public class HeadResultsPlot extends PDFPlot {
 		
 		getData();
 
-		setXCalibration();
-		
+		setXCalibration();		
 		setYCalibrationTheta();
-
-		setYCalibrationVelocity();
-		
+		setYCalibrationVelocity();		
 		setYCalibrationHRI();
 
 		renderPlot();
@@ -175,7 +172,7 @@ public class HeadResultsPlot extends PDFPlot {
 	}
 	
 	private void setXCalibration() {
-		xBaseValue = (int) PDFTools.getBaseValue(xMax - 0, 7, 0.25,1,2,5);
+		xBaseValue = PDFTools.getBaseValue(timeOfStack, 7, 0.25, 0.5,1,2,5);
 	}
 	
 	private void addPlot() {
@@ -224,7 +221,6 @@ public class HeadResultsPlot extends PDFPlot {
 	
 	@SuppressWarnings("deprecation")
 	private void addLowerDesc() {
-		
 		try {
 			cts.drawLine(hX0, hY0, hX0 + hW + pdt.lineWidth, hY0);
 		} catch (IOException e) {
@@ -233,14 +229,13 @@ public class HeadResultsPlot extends PDFPlot {
 		
 		int y0 = hY0 - pdt.space;
 		float x;
-		float numberOfIndicators = 5;
+		float numberOfIndicators = (float) (PDFTools.getNextMultipleOf(xBaseValue, timeOfStack)/xBaseValue);
 		double desValue;
-		
 		for(int z = 0; z <= numberOfIndicators; z++) {
 			try {
 				x = hX0 + hW * z/numberOfIndicators;
 				cts.drawLine(x, y0, x, hY0);
-				desValue = (z/numberOfIndicators);
+				desValue = z*xBaseValue;
 				PDFTools.insertTextBoxXCentered(cts, x, y0 - pdt.space, dFormat1.format((desValue)) , pdt.subDescSize);
 			} catch (IOException e) {
 				System.out.println("exception in addSideDesc");

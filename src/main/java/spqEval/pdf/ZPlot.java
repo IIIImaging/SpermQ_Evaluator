@@ -168,7 +168,6 @@ public class ZPlot extends PDFPlot {
 		xMaxRa = (int) (range.getMaxX());
 		xMinRa = (int) (range.getMinX());
 		yMaxRa = range.getMaxY();
-		yMinRa = range.getMinY();
 		xMinAv = (int) (average.getMinX());
 		xMaxAv = (int) (average.getMaxX());
 		yMinAv = average.getMinY();
@@ -199,7 +198,6 @@ public class ZPlot extends PDFPlot {
 		
 		yBaseValueRa = PDFTools.getBaseValue(yMaxRa-yMinRa, 4, 0.25,1,2,5);		
 		yMaxRa = PDFTools.getNextMultipleOf(yBaseValueRa, yMaxRa);
-		yMinRa = PDFTools.getNextMultipleOf(yBaseValueRa, yMinRa) - yBaseValueRa;
 	}
 		
 	@SuppressWarnings("deprecation")
@@ -223,7 +221,7 @@ public class ZPlot extends PDFPlot {
 				x = aX0 + aW * z/numberOfIndicators;
 				cts.drawLine(x, y0, x, aY0);
 				desValue = (z/numberOfIndicators * arcLengthMicron);
-				PDFTools.insertTextBoxXCentered(cts, x, y0 - pdt.space, Integer.toString((int) (desValue)) , pdt.subDescSize);
+				PDFTools.insertTextBoxXCentered(cts, x, y0 - pdt.space, Long.toString(Math.round(desValue)) , pdt.subDescSize);
 			} catch (IOException e) {
 				System.out.println("exception in addSideDesc");
 			}

@@ -213,13 +213,12 @@ public class YPlot extends PDFPlot {
 				x = aX0 + aW * z/numberOfIndicators;
 				cts.drawLine(x, y0, x, aY0);
 				desValue = (z/numberOfIndicators * arcLengthMicron);
-				PDFTools.insertTextBoxXCentered(cts, x, y0 - pdt.space, Integer.toString((int) (desValue)) , pdt.subDescSize);
+				PDFTools.insertTextBoxXCentered(cts, x, y0 - pdt.space, Long.toString(Math.round(desValue)) , pdt.subDescSize);
 			} catch (IOException e) {
 				System.out.println("exception in addSideDesc");
 			}
 		}
 		PDFTools.insertTextBoxXCentered(cts, aX0 + aW/2, aY0 - pdt.space*2 - pdt.descSize, "arc length (µm)", pdt.subDescSize);
-		
 	}
 	
 	@SuppressWarnings("deprecation")
