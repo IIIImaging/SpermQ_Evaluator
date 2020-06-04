@@ -1,7 +1,7 @@
 ﻿package spqEval;
 
 /** ===============================================================================
-* SpermQEvaluator_.java Version 1.0.6
+* SpermQEvaluator_.java Version 1.0.7
 * 
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -17,7 +17,7 @@
 * License along with this program.  If not, see
 * <http://www.gnu.org/licenses/gpl-3.0.html>.
 *  
-* Copyright (C) 2018: Jan N. Hansen and Sebastian Raßmann;
+* Copyright (C) 2017-2020: Jan N. Hansen and Sebastian Raßmann;
 * 		research group Biophysical Imaging, Institute of Innate Immunity, Bonn, Germany
 * 		(http://www.iii.uni-bonn.de/en/wachten_lab/).
 * 
@@ -31,6 +31,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -54,12 +55,12 @@ import spqEval.tools.constants;
 import spqEval.tools.tools;
 
 public class Main extends javax.swing.JFrame implements ActionListener {
-	private static final String version = "1.0.6";
+	private static final String version = "1.0.7";
 	
 	private static final long serialVersionUID = 1L;	
 	
 	private static String referenceLine = "This file was generated using SpermQ_Evaluator,"
-			+ " a java application by Jan Niklas Hansen (\u00a9 2017 - 2019)"
+			+ " a java application by Jan Niklas Hansen (\u00a9 2017 - 2020)"
 			+ " (for credits see: https://github.com/IIIImaging/SpermQ_Evaluator).";
 	
 	public static final int ERROR = 0;
@@ -132,7 +133,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 		int prefXSize = 600, prefYSize = 570;
 		this.setMinimumSize(new java.awt.Dimension(prefXSize, prefYSize+40));
 		this.setSize(prefXSize, prefYSize+40);			
-		this.setTitle("SpermQ Evaluator " + version + " (\u00a9 2017 - 2018)");
+		this.setTitle("SpermQ Evaluator " + version + " (\u00a9 2017 - 2020)");
 //		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		//Surface
 			bgPanel = new JPanel();
@@ -167,54 +168,62 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 				jScrollPane1 = new JScrollPane();
 				jScrollPane1.setHorizontalScrollBarPolicy(30);
 				jScrollPane1.setVerticalScrollBarPolicy(20);
-				jScrollPane1.setPreferredSize(new java.awt.Dimension(prefXSize-10, 340));
+				jScrollPane1.setPreferredSize(new java.awt.Dimension(prefXSize-10, 320));
 				bgPanel.add(jScrollPane1);
 				{
 					Liste1 = new JList<Object>();
 					jScrollPane1.setViewportView(Liste1);
 					Liste1.setModel(new DefaultComboBoxModel(new String[] { "" }));
 				}
+			}
+			{
+				JPanel spacer = new JPanel();
+				spacer.setMaximumSize(new java.awt.Dimension(prefXSize,10));
+				spacer.setVisible(true);
+				bgPanel.add(spacer);
+			}
+			{
+//				int locHeight = 30;
+//				JPanel bottom = new JPanel(new GridLayout(1,3));
+				JPanel bottom = new JPanel();
+				bottom.setLayout(new BoxLayout(bottom, BoxLayout.X_AXIS));
+//				bottom.setPreferredSize(new java.awt.Dimension(prefXSize,locHeight));
+				bottom.setVisible(true);
+				bottom.setOpaque(false);
+				bgPanel.add(bottom);		
 				{
-					JPanel spacer = new JPanel();
-					spacer.setMaximumSize(new java.awt.Dimension(prefXSize,10));
-					spacer.setVisible(true);
-					bgPanel.add(spacer);
+					loadButton = new JButton();
+					loadButton.addActionListener(this);
+					loadButton.setText("add SpermQ results folder(s) to list");
+					loadButton.setVisible(true);
+					loadButton.setOpaque(true);
+					loadButton.setVerticalAlignment(SwingConstants.BOTTOM);
+					bottom.add(loadButton);
 				}
 				{
-					JPanel bottom = new JPanel();
-					bottom.setMaximumSize(new java.awt.Dimension(prefXSize,10));
-					bottom.setVisible(true);
-					bgPanel.add(bottom);
-					int locHeight = 30;
-					int locWidth3 = prefXSize/4-60;
-					{
-						loadButton = new JButton();
-						loadButton.addActionListener(this);
-						loadButton.setText("add SpermQ results folder(s) to list");
-						loadButton.setMinimumSize(new java.awt.Dimension(locWidth3,locHeight));
-						loadButton.setVisible(true);
-						loadButton.setVerticalAlignment(SwingConstants.BOTTOM);
-						bottom.add(loadButton);
-					}
-					{
-						removeButton = new JButton();
-						removeButton.addActionListener(this);
-						removeButton.setText("remove folder(s) from list");
-						removeButton.setMinimumSize(new java.awt.Dimension(locWidth3,locHeight));
-						removeButton.setVisible(true);
-						removeButton.setVerticalAlignment(SwingConstants.BOTTOM);
-						bottom.add(removeButton);
-					}	
-					{
-						goButton = new JButton();
-						goButton.addActionListener(this);
-						goButton.setText("start analysis");
-						goButton.setMinimumSize(new java.awt.Dimension(locWidth3,locHeight));
-						goButton.setVisible(true);
-						goButton.setVerticalAlignment(SwingConstants.BOTTOM);
-						bottom.add(goButton);
-					}	
+					removeButton = new JButton();
+					removeButton.addActionListener(this);
+					removeButton.setText("remove folder(s) from list");
+					removeButton.setVisible(true);
+					removeButton.setOpaque(true);
+					removeButton.setVerticalAlignment(SwingConstants.BOTTOM);
+					bottom.add(removeButton);
 				}	
+				{
+					goButton = new JButton();
+					goButton.addActionListener(this);
+					goButton.setText("start analysis");
+					goButton.setVisible(true);
+					goButton.setOpaque(true);
+					goButton.setVerticalAlignment(SwingConstants.BOTTOM);
+					bottom.add(goButton);
+				}	
+			}
+			{
+				JPanel spacer = new JPanel();
+				spacer.setMaximumSize(new java.awt.Dimension(prefXSize,10));
+				spacer.setVisible(true);
+				bgPanel.add(spacer);
 			}
 			{
 				progressBar = new JProgressBar();

@@ -12,7 +12,7 @@
 <!-- Plugin Information -->
 	<groupId>IIIImaging</groupId>
 	<artifactId>SpermQ_Evaluator</artifactId>
-	<version>1.0.6</version>
+	<version>1.0.7</version>
 	<name>SpermQ Evaluator</name>
 	<description>Evaluation tool for SpermQ results folders.</description>
  	<inceptionYear>2017</inceptionYear>	
