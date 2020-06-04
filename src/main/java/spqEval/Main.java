@@ -31,7 +31,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -739,7 +738,7 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 			}
 		}
 		
-		saveHeadCoordinates(file, d, kymoDataArray, results, lastPos, maxTimePerFrame);	//TODO
+		saveHeadCoordinates(file, d, kymoDataArray, results, lastPos, maxTimePerFrame);
 				
 		File fileRes;
 		FileWriter fw;
