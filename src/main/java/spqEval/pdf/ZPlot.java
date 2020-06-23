@@ -2,7 +2,7 @@ package spqEval.pdf;
 
 /** 
 ===============================================================================
-* SpermQEvaluator_.java Version 1.0.6
+* SpermQEvaluator_.java Version 1.0.1
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -53,7 +53,7 @@ public class ZPlot extends PDFPlot {
 	int highestUndefined;
 	int xBaseValue = 50;
 	double yBaseValueAv, yBaseValueRa;
-	double arcLengthMicron;
+	double arcLenghtµm;
 	
 	static final String nameOfAveragePlot = "Z_average_plot.png";
 	static final String nameOfRangePlot = "Z_range_plot.png";
@@ -118,13 +118,8 @@ public class ZPlot extends PDFPlot {
 			
 		}
 		catch(Exception e){
+			System.out.println(e.getMessage());
 			System.out.println("error! - caught Exception !");
-			System.out.println(e.getCause());
-			String out = "";
-			for(int err = 0; err < e.getStackTrace().length; err++){
-				out += " \n " + e.getStackTrace()[err].toString();
-			}
-			System.out.println(out);
 		}
 	}
 	
@@ -146,28 +141,22 @@ public class ZPlot extends PDFPlot {
 		range = new XYSeries ("range_plot");
 		average = new XYSeries ("average_plot");
 
-		Result r = new Result(PDFPage.sourcePath, coverageThreshold);
-		double [][] rawData = r.getFlagellarParameterResult("Z",(int)slicesPerCycle);	//TODO
+		Result r = new Result(PDFPage.sourcePath, 5);
+		float [][] rawData = r.getKymoResults("Z");
 
 		int arcL;
 		for (arcL = 0; arcL < rawData.length; arcL++) {
-			if(rawData[arcL][0] != Double.NEGATIVE_INFINITY && rawData[arcL][1] > Double.NEGATIVE_INFINITY  
-					&& !Double.isNaN(rawData[arcL][0])  && !Double.isNaN(rawData[arcL][1])) {
+			if(rawData[arcL][0] > Float.NEGATIVE_INFINITY && rawData[arcL][1] > Float.NEGATIVE_INFINITY) {
 				range.add(arcL, rawData[arcL][1] - rawData[arcL][0]);
-//				System.out.println("incl min max " + arcL + ":	" + rawData[arcL][0] + " / " + rawData[arcL][1]);
-			}else{
-//				System.out.println("EXCL min max " + arcL + ":	" + rawData[arcL][0] + " / " + rawData[arcL][1]);
 			}
-			if(rawData[arcL][3] != Double.NEGATIVE_INFINITY  && !Double.isNaN(rawData[arcL][3])) {
-//				System.out.println("incl avg " + arcL + ":	" + rawData[arcL][3]);
+			if(rawData[arcL][2] > Float.NEGATIVE_INFINITY) {
 				average.add(arcL, rawData[arcL][3]);
-			}else{
-//				System.out.println("EXCL avg " + arcL + ":	" + rawData[arcL][3]);
 			}
 		}
 		xMaxRa = (int) (range.getMaxX());
 		xMinRa = (int) (range.getMinX());
 		yMaxRa = range.getMaxY();
+		yMinRa = range.getMinY();
 		xMinAv = (int) (average.getMinX());
 		xMaxAv = (int) (average.getMaxX());
 		yMinAv = average.getMinY();
@@ -190,7 +179,7 @@ public class ZPlot extends PDFPlot {
 		double absoluteArcLenght = xInUM;
 		xInUM = PDFTools.getNextMultipleOf(xBaseValue, xInUM);		
 		xMax = (xMax/(absoluteArcLenght / xInUM));
-		this.arcLengthMicron = xInUM;
+		this.arcLenghtµm = xInUM;
 		
 		yBaseValueAv = PDFTools.getBaseValue(yMaxAv-yMinAv, 4, 0.25,1,2,5);		
 		yMaxAv = PDFTools.getNextMultipleOf(yBaseValueAv, yMaxAv);
@@ -198,6 +187,7 @@ public class ZPlot extends PDFPlot {
 		
 		yBaseValueRa = PDFTools.getBaseValue(yMaxRa-yMinRa, 4, 0.25,1,2,5);		
 		yMaxRa = PDFTools.getNextMultipleOf(yBaseValueRa, yMaxRa);
+		yMinRa = PDFTools.getNextMultipleOf(yBaseValueRa, yMinRa) - yBaseValueRa;
 	}
 		
 	@SuppressWarnings("deprecation")
@@ -211,17 +201,15 @@ public class ZPlot extends PDFPlot {
 		
 		int y0 = aY0 - pdt.space;
 		float x;
-		float numberOfIndicators = (int) (arcLengthMicron / xBaseValue);
-//		System.out.println("addLowerDesc" + arcLengthMicron + " / " + xBaseValue);
-		
+		float numberOfIndicators = (int) (arcLenghtµm / xBaseValue);
 		double desValue;
 		
 		for(int z = 0; z <= numberOfIndicators; z++) {
 			try {
 				x = aX0 + aW * z/numberOfIndicators;
 				cts.drawLine(x, y0, x, aY0);
-				desValue = (z/numberOfIndicators * arcLengthMicron);
-				PDFTools.insertTextBoxXCentered(cts, x, y0 - pdt.space, Long.toString(Math.round(desValue)) , pdt.subDescSize);
+				desValue = (z/numberOfIndicators * arcLenghtµm);
+				PDFTools.insertTextBoxXCentered(cts, x, y0 - pdt.space, Integer.toString((int) (desValue)) , pdt.subDescSize);
 			} catch (IOException e) {
 				System.out.println("exception in addSideDesc");
 			}
@@ -238,7 +226,6 @@ public class ZPlot extends PDFPlot {
 		float yCorrectionNumbers = pdt.subDescSize/2;
 		
 		int numberOfIndicators = (int) ((yMaxRa - yMinRa) / yBaseValueRa);
-//		System.out.println("addDescRange" + (yMaxRa - yMinRa) + " / " + yBaseValueRa);
 		
 		for(int z = 0; z <= numberOfIndicators; z++) {
 			try {
@@ -267,7 +254,6 @@ public class ZPlot extends PDFPlot {
 		float yCorrectionNumbers = pdt.subDescSize/2;
 		
 		int numberOfIndicators = (int) (yMaxAv / yBaseValueAv);
-//		System.out.println("addDescAverage" + (yMaxAv) + " / " + yBaseValueAv);
 		
 		for(int z = 0; z <= numberOfIndicators; z++) {
 			try {
@@ -285,6 +271,6 @@ public class ZPlot extends PDFPlot {
 			e.printStackTrace();
 		}
 		PDFTools.insertTextBoxRotatedUpward(cts, x, aY0+aH/2, "average z", pdt.subDescSize);
-		PDFTools.insertTextBoxRotatedUpward(cts, x + pdt.space+ pdt.subDescSize, aY0+aH/2, "(normalized)", pdt.subDescSize);
+		PDFTools.insertTextBoxRotatedUpward(cts, x + pdt.space+ pdt.subDescSize, aY0+aH/2, "(µm)", pdt.subDescSize);
 	}
 }

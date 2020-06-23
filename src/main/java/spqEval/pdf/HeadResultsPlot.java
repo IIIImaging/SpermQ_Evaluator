@@ -2,7 +2,7 @@ package spqEval.pdf;
 
 /** 
 ===============================================================================
-* SpermQEvaluator_.java Version 1.0.6
+* SpermQEvaluator_.java Version 1.0.1
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -56,10 +56,10 @@ public class HeadResultsPlot extends PDFPlot {
 	double yBaseValueT;
 	double yBaseValueV;
 	float yBaseValueH = 0.25f;
-	double arcLengthMicron;
+	double arcLenghtµm;
 	
+	static final String nameOfVelocityPlot = "Velocity_plot.png";
 	static final String nameOfThetaPlot = "Theta_plot.png";
-	static final String nameOfVeloPlot = "Velocity_plot.png";
 	static final String nameOfHRIMaxPlot = "HRIMax_plot.png";
 	String thetaPlotPath, velocityPlotPath, hriMaxPlotPath;
 		
@@ -79,17 +79,20 @@ public class HeadResultsPlot extends PDFPlot {
 		plotHeight = height;
 		x = posX;
 		y = posY;
-		thetaPlotPath = targetPath + nameOfThetaPlot;
-		velocityPlotPath = targetPath + nameOfVeloPlot;
+		thetaPlotPath = targetPath + nameOfVelocityPlot;
+		velocityPlotPath = targetPath + nameOfThetaPlot;
 		hriMaxPlotPath = targetPath + nameOfHRIMaxPlot;
 		
-		desc = "upper panel: orientation of head-midpiece axis in space, middle panel: velocity of head in space, bottom panel: rolling";
+		desc = "upper panel: orientation of head-midpiece axis in space, middle panel: velocity of head in space, bottom panel: head rolling";
 		
 		getData();
 
-		setXCalibration();		
+		setXCalibration();
+		
 		setYCalibrationTheta();
-		setYCalibrationVelocity();		
+
+		setYCalibrationVelocity();
+		
 		setYCalibrationHRI();
 
 		renderPlot();
@@ -98,12 +101,12 @@ public class HeadResultsPlot extends PDFPlot {
 	
 	protected void renderPlot() {
 		
-		Plot plot1 = new Plot(plotWidth*pdt.resolution/nOfPlots, plotHeight*pdt.resolution/nOfPlots, thetaPlotPath, nameOfVeloPlot, theta);
+		Plot plot1 = new Plot(plotWidth*pdt.resolution/nOfPlots, plotHeight*pdt.resolution/nOfPlots, thetaPlotPath, nameOfThetaPlot, theta);
 		plot1.setLineColor(thetaColors);
 		plot1.setRanges(xMin, yMinT, xMax, yMaxT);
 		plot1.renderPlot(false, true, pdt.plotLineWidthFactor*pdt.resolution/nOfPlots);
 		
-		Plot plot2 = new Plot(plotWidth*pdt.resolution/nOfPlots, plotHeight*pdt.resolution/nOfPlots, velocityPlotPath,  nameOfThetaPlot , velocity);
+		Plot plot2 = new Plot(plotWidth*pdt.resolution/nOfPlots, plotHeight*pdt.resolution/nOfPlots, velocityPlotPath,  nameOfVelocityPlot , velocity);
 		plot2.setLineColor(velocityColors);
 		plot2.setRanges(xMin, yMinV, xMax, yMaxV);
 		plot2.renderPlot(false, true, pdt.plotLineWidthFactor*pdt.resolution/nOfPlots);
@@ -120,7 +123,7 @@ public class HeadResultsPlot extends PDFPlot {
 		velocity = new XYSeries ("velocity_plot");
 		hri = new XYSeries ("hriMax_plot");
 
-		Result r = new Result(PDFPage.sourcePath,coverageThreshold);
+		Result r = new Result(PDFPage.sourcePath, 5);
 
 		float [][] rawData = r.getHeadResults();
 		
@@ -129,13 +132,14 @@ public class HeadResultsPlot extends PDFPlot {
 		int arrayBound = (int) xMax;
 		if(arrayBound > rawData[0].length) arrayBound = rawData[0].length;		
 		int i;
-		rawData[2] = PDFTools.normalizeValuesFloatAccordingToRange(rawData[2], 0, arrayBound);
+		rawData[2] = PDFTools.normalizeValuesFloat(rawData[2]);
 		for (i = 0; i < arrayBound; i++) {
 			if(rawData[0][i] > Float.NEGATIVE_INFINITY) {
 				theta.add(i, rawData[0][i]);
 			}
 			if(rawData[1][i] > Float.NEGATIVE_INFINITY) {
 				velocity.add(i, rawData[1][i]);
+//				System.out.println(rawData[1][i]);
 			}
 			if(rawData[2][i] > Float.NEGATIVE_INFINITY) {
 				hri.add(i, rawData[2][i]);
@@ -158,7 +162,8 @@ public class HeadResultsPlot extends PDFPlot {
 	private void setYCalibrationTheta() {
 		yBaseValueT = PDFTools.getBaseValue(yMaxT-yMinT, 3, 0.25,1,2,5);		
 		yMaxT = PDFTools.getNextMultipleOf(yBaseValueT, yMaxT);
-		yMinT = PDFTools.getNextMultipleOf(yBaseValueT, yMinT) - yBaseValueT;		
+		yMinT = PDFTools.getNextMultipleOf(yBaseValueT, yMinT) - yBaseValueT;
+		
 	}
 	
 	private void setYCalibrationHRI() {
@@ -172,7 +177,7 @@ public class HeadResultsPlot extends PDFPlot {
 	}
 	
 	private void setXCalibration() {
-		xBaseValue = PDFTools.getBaseValue(timeOfStack, 7, 0.25, 0.5,1,2,5);
+		xBaseValue = (int) PDFTools.getBaseValue(xMax - 0, 7, 0.25,1,2,5);
 	}
 	
 	private void addPlot() {
@@ -206,21 +211,18 @@ public class HeadResultsPlot extends PDFPlot {
 			addDescTheta();
 			addDescVelocity();
 			addDescHRI();
-			addLowerDesc();			
+			addLowerDesc();
+			
 		}
 		catch(Exception e){
+			System.out.println(e.getMessage());
 			System.out.println("error! - caught Exception !");
-			System.out.println(e.getCause());
-			String out = "";
-			for(int err = 0; err < e.getStackTrace().length; err++){
-				out += " \n " + e.getStackTrace()[err].toString();
-			}
-			System.out.println(out);
 		}
 	}
 	
 	@SuppressWarnings("deprecation")
 	private void addLowerDesc() {
+		
 		try {
 			cts.drawLine(hX0, hY0, hX0 + hW + pdt.lineWidth, hY0);
 		} catch (IOException e) {
@@ -229,13 +231,14 @@ public class HeadResultsPlot extends PDFPlot {
 		
 		int y0 = hY0 - pdt.space;
 		float x;
-		float numberOfIndicators = (float) (PDFTools.getNextMultipleOf(xBaseValue, timeOfStack)/xBaseValue);
+		float numberOfIndicators = 5;
 		double desValue;
+		
 		for(int z = 0; z <= numberOfIndicators; z++) {
 			try {
 				x = hX0 + hW * z/numberOfIndicators;
 				cts.drawLine(x, y0, x, hY0);
-				desValue = z*xBaseValue;
+				desValue = (z/numberOfIndicators);
 				PDFTools.insertTextBoxXCentered(cts, x, y0 - pdt.space, dFormat1.format((desValue)) , pdt.subDescSize);
 			} catch (IOException e) {
 				System.out.println("exception in addSideDesc");
@@ -289,8 +292,8 @@ public class HeadResultsPlot extends PDFPlot {
 				System.out.println("exception in addSideDesc");
 			}
 		}
-		PDFTools.insertTextBoxToRightBoundYCentrated(cts, x2, vY0 + yCorrectionNumbers, dFormat0.format(yMinV), pdt.subDescSize);
-		PDFTools.insertTextBoxToRightBound(cts, x2, vY0 + vH + yCorrectionNumbers, dFormat0.format(yMaxV), pdt.subDescSize);
+		PDFTools.insertTextBoxToRightBoundYCentrated(cts, x2, vY0 + yCorrectionNumbers, dFormat2.format(yMinV), pdt.subDescSize);
+		PDFTools.insertTextBoxToRightBound(cts, x2, vY0 + vH + yCorrectionNumbers, dFormat2.format(yMaxV), pdt.subDescSize);
 		try {
 			cts.drawLine(vX0, vY0, vX0, vY0 + vH + pdt.lineWidth);
 		} catch (IOException e) {
@@ -308,7 +311,7 @@ public class HeadResultsPlot extends PDFPlot {
 		float yCorrectionNumbers = pdt.subDescSize/2;
 		
 		int numberOfIndicators = (int) (yMaxH / yBaseValueH);
-		if(numberOfIndicators < 1) numberOfIndicators = 1;
+		
 		for(int z = 0; z <= numberOfIndicators; z++) {
 			try {
 				y = hY0 + hH * (numberOfIndicators - z)/numberOfIndicators;

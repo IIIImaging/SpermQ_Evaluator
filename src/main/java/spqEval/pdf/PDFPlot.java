@@ -2,7 +2,7 @@ package spqEval.pdf;
 
 /** 
 ===============================================================================
-* SpermQEvaluator_.java Version 1.0.6
+* SpermQEvaluator_.java Version 1.0.1
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -46,8 +46,8 @@ public class PDFPlot extends PDFPage {
 	static int yOffset;
 	String desc = "description missing!";
 
-	public PDFPlot(String sourcePath, String expName, String targetPath, double threshold) {
-		super(sourcePath, expName, targetPath, threshold);
+	public PDFPlot(String sourcePath, String expName, String targetPath) {
+		super(sourcePath, expName, targetPath);
 		// TODO Auto-generated constructor stub
 	}
 

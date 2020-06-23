@@ -2,7 +2,7 @@ package spqEval.pdf;
 
 /** 
 ===============================================================================
-* SpermQEvaluator_.java Version 1.0.6
+* SpermQEvaluator_.java Version 1.0.1
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -53,7 +53,7 @@ public class KAPlot extends PDFPlot {
 	int highestUndefined;
 	int xBaseValue = 50;
 	double yBaseValueAv, yBaseValueRa;
-	double arcLengthMicron;
+	double arcLenghtµm;
 	
 	static final String nameOfAveragePlot = "KA_average_plot.png";
 	static final String nameOfRangePlot = "KA_range_plot.png";
@@ -115,13 +115,8 @@ public class KAPlot extends PDFPlot {
 			
 		}
 		catch(Exception e){
+			System.out.println(e.getMessage());
 			System.out.println("error! - caught Exception !");
-			System.out.println(e.getCause());
-			String out = "";
-			for(int err = 0; err < e.getStackTrace().length; err++){
-				out += " \n " + e.getStackTrace()[err].toString();
-			}
-			System.out.println(out);
 		}
 	}
 	
@@ -143,17 +138,15 @@ public class KAPlot extends PDFPlot {
 		range = new XYSeries ("range_plot");
 		average = new XYSeries ("average_plot");
 
-		Result r = new Result(PDFPage.sourcePath, coverageThreshold);
-		double [][] rawData = r.getFlagellarParameterResult("cAng", (int)slicesPerCycle);
+		Result r = new Result(PDFPage.sourcePath, 5);
+		float [][] rawData = r.getKymoResults("cAng");
 
 		int arcL;
 		for (arcL = 0; arcL < rawData.length; arcL++) {
-			if(rawData[arcL][0] > Double.NEGATIVE_INFINITY && rawData[arcL][1] > Double.NEGATIVE_INFINITY 
-					&& !Double.isNaN(rawData[arcL][0]) && !Double.isNaN(rawData[arcL][1])) {
+			if(rawData[arcL][0] > Float.NEGATIVE_INFINITY && rawData[arcL][1] > Float.NEGATIVE_INFINITY) {
 				range.add(arcL, rawData[arcL][1] - rawData[arcL][0]);
 			}
-			if(rawData[arcL][3] > Double.NEGATIVE_INFINITY && !Double.isNaN(rawData[arcL][3])) {
-//				System.out.println(arcL + ": " + rawData[arcL][3]);
+			if(rawData[arcL][2] > Float.NEGATIVE_INFINITY) {
 				average.add(arcL, rawData[arcL][3]);
 			}
 		}
@@ -165,8 +158,8 @@ public class KAPlot extends PDFPlot {
 		xMaxAv = (int) (average.getMaxX());
 		yMinAv = average.getMinY();
 		yMaxAv = average.getMaxY();
-//		System.out.println("ranges Ra : " + xMaxRa + "|" + xMinRa + "|" + yMaxRa + "|" + yMinRa);
-//		System.out.println("ranges Av : " + xMaxAv + "|" + xMinAv + "|" + yMaxAv + "|" + yMinAv);
+//		System.out.println("ranges : " + xMaxRa + "|" + xMinRa + "|" + yMaxRa + "|" + yMinRa);
+//		System.out.println("ranges : " + xMaxAv + "|" + xMinAv + "|" + yMaxAv + "|" + yMinAv);
 	}
 
 	private void setXCalibration() {
@@ -183,11 +176,12 @@ public class KAPlot extends PDFPlot {
 		double absoluteArcLenght = xInUM;
 		xInUM = PDFTools.getNextMultipleOf(xBaseValue, xInUM);		
 		xMax = (xMax/(absoluteArcLenght / xInUM));
-		this.arcLengthMicron = xInUM;
+		this.arcLenghtµm = xInUM;
 		
 		yBaseValueAv = PDFTools.getBaseValue(yMaxAv - yMinAv, 4, 0.25,1,2,5);
 		yMaxAv = PDFTools.getNextMultipleOf(yBaseValueAv, yMaxAv);
 		yMinAv = PDFTools.getNextMultipleOf(yBaseValueAv, yMinAv) - yBaseValueAv;
+		
 		yBaseValueRa = PDFTools.getBaseValue(yMaxRa - yMinRa, 4, 0.25,1,2,5);
 		yMaxRa = PDFTools.getNextMultipleOf(yBaseValueRa, yMaxRa);
 		yMinRa = PDFTools.getNextMultipleOf(yBaseValueRa, yMinRa) - yBaseValueRa;		
@@ -204,23 +198,17 @@ public class KAPlot extends PDFPlot {
 		
 		int y0 = aY0 - pdt.space;
 		float x;
-		float numberOfIndicators = (int) ( arcLengthMicron/ xBaseValue);
+		float numberOfIndicators = (int) ( arcLenghtµm/ xBaseValue);
 		double desValue;
 		
 		for(int z = 0; z <= numberOfIndicators; z++) {
 			try {
 				x = aX0 + aW * z/numberOfIndicators;
 				cts.drawLine(x, y0, x, aY0);
-				desValue = (z/numberOfIndicators * arcLengthMicron);
-				PDFTools.insertTextBoxXCentered(cts, x, y0 - pdt.space, Long.toString(Math.round(desValue)) , pdt.subDescSize);
+				desValue = (z/numberOfIndicators * arcLenghtµm);
+				PDFTools.insertTextBoxXCentered(cts, x, y0 - pdt.space, Integer.toString((int) (desValue)) , pdt.subDescSize);
 			} catch (IOException e) {
-				System.out.println("KAPlot exception in addSideDesc");
-				System.out.println(e.getCause());
-				String out = "";
-				for(int err = 0; err < e.getStackTrace().length; err++){
-					out += " \n " + e.getStackTrace()[err].toString();
-				}
-				System.out.println(out);
+				System.out.println("exception in addSideDesc");
 			}
 		}
 		PDFTools.insertTextBoxXCentered(cts, aX0 + aW/2, aY0 - pdt.space*2 - pdt.descSize, "arc length (µm)", pdt.subDescSize);
@@ -234,20 +222,14 @@ public class KAPlot extends PDFPlot {
 		int x2 = rX0 - pdt.space*2;
 		float yCorrectionNumbers = pdt.subDescSize/2;
 		
-		int numberOfIndicators = (int) ((yMaxRa - yMinRa) / yBaseValueRa);
+		int numberOfIndicators = (int) ((yMaxRa - xMinRa) / yBaseValueRa);
 		
 		for(int z = 0; z <= numberOfIndicators; z++) {
 			try {
 				y = rY0 + rH * (numberOfIndicators-z)/numberOfIndicators;
 				cts.drawLine(x1, y, rX0, y);
 			} catch (IOException e) {
-				System.out.println("KAPlot exception in addSideDesc");
-				System.out.println(e.getCause());
-				String out = "";
-				for(int err = 0; err < e.getStackTrace().length; err++){
-					out += " \n " + e.getStackTrace()[err].toString();
-				}
-				System.out.println(out);
+				System.out.println("exception in addSideDesc");
 			}
 		}
 		PDFTools.insertTextBoxToRightBoundYCentrated(cts, x2, rY0 + yCorrectionNumbers, Integer.toString((int) (yMinRa)), pdt.subDescSize);
@@ -255,13 +237,7 @@ public class KAPlot extends PDFPlot {
 		try {
 			cts.drawLine(rX0, rY0 - pdt.lineWidth, rX0, rY0 + rH + pdt.lineWidth);
 		} catch (IOException e) {
-			System.out.println("KAPlot exception in addSideDesc 2");
-			System.out.println(e.getCause());
-			String out = "";
-			for(int err = 0; err < e.getStackTrace().length; err++){
-				out += " \n " + e.getStackTrace()[err].toString();
-			}
-			System.out.println(out);
+			e.printStackTrace();
 		}
 		PDFTools.insertTextBoxRotatedUpward(cts, x, rY0+rH/2, "range of curvature angle", pdt.subDescSize);
 		PDFTools.insertTextBoxRotatedUpward(cts, x + pdt.space+ pdt.subDescSize, rY0+rH/2, "(°)", pdt.subDescSize);
@@ -274,35 +250,22 @@ public class KAPlot extends PDFPlot {
 		int x2 = aX0 - pdt.space*2;
 		float yCorrectionNumbers = pdt.subDescSize/2;
 		
-		int numberOfIndicators = (int) ((yMaxAv-yMinAv) / yBaseValueAv);
-//		System.out.println("xMaxAv" + yMaxAv);
-//		System.out.println("xBaseValueAv" + yBaseValueAv);
+		int numberOfIndicators = (int) (yMaxAv / yBaseValueAv);
+		
 		for(int z = 0; z <= numberOfIndicators; z++) {
 			try {
 				y = aY0 + aH * (numberOfIndicators - z)/numberOfIndicators;
 				cts.drawLine(x1, y, aX0, y);
 			} catch (IOException e) {
-				System.out.println("KAPlot exception in addDescAvg");
-				System.out.println(e.getCause());
-				String out = "";
-				for(int err = 0; err < e.getStackTrace().length; err++){
-					out += " \n " + e.getStackTrace()[err].toString();
-				}
-				System.out.println(out);
+				System.out.println("exception in addSideDesc");
 			}
 		}
-		PDFTools.insertTextBoxToRightBoundYCentrated(cts, x2, aY0 + yCorrectionNumbers, Integer.toString((int) (yMinAv)), pdt.subDescSize);
+		PDFTools.insertTextBoxToRightBoundYCentrated(cts, x2, aY0 + yCorrectionNumbers, Integer.toString((int) (0)), pdt.subDescSize);
 		PDFTools.insertTextBoxToRightBound(cts, x2, aY0 + aH + yCorrectionNumbers, Integer.toString((int) (yMaxAv)), pdt.subDescSize);
 		try {
 			cts.drawLine(aX0, aY0, aX0, aY0 + aH + pdt.lineWidth);
 		} catch (IOException e) {
-			System.out.println("KAPlot exception in addDescAvg 2");
-			System.out.println(e.getCause());
-			String out = "";
-			for(int err = 0; err < e.getStackTrace().length; err++){
-				out += " \n " + e.getStackTrace()[err].toString();
-			}
-			System.out.println(out);
+			e.printStackTrace();
 		}
 		PDFTools.insertTextBoxRotatedUpward(cts, x, aY0+aH/2, "average curvature angle", pdt.subDescSize);
 		PDFTools.insertTextBoxRotatedUpward(cts, x + pdt.space+ pdt.subDescSize, aY0+aH/2, "(°)", pdt.subDescSize);
