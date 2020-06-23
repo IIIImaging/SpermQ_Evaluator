@@ -2,7 +2,7 @@ package spqEval.pdf;
 
 /** 
 ===============================================================================
-* SpermQEvaluator_.java Version 1.0.1
+* SpermQEvaluator_.java Version 1.0.6
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -46,7 +46,7 @@ public class BeatCircleRepr extends PDFPage{
 	int bX0, bY0;					//origin (lower left corner) of the box
 	
 	double scaleFactor = 1.25;
-	double imageRange, imageRangeµm;
+	double imageRange, imageRangeMicron;
 	int lDescSpacer;
 	
 	BeatCircleLUT lut;	
@@ -86,12 +86,12 @@ public class BeatCircleRepr extends PDFPage{
 	@SuppressWarnings("deprecation")
 	private void addFullBeatCycleRep() {
 		
-		lDescSpacer = PDFTools.calculateMaxWidth(pdt.subDescSize, dFormat1.format(imageRangeµm), "µm");
+		lDescSpacer = PDFTools.calculateMaxWidth(pdt.subDescSize, dFormat1.format(imageRangeMicron), "µm");
 
 		iW = imageBoxSize;
 		iH = imageBoxSize;
 		iX0 = x + lDescSpacer;
-		iY0 = y - pdt.header - iH;
+		iY0 = y - pdt.header - pdt.space*2 - iH;
 
 		bW = (int)(iW *(1-2*cfX));
 		bH = pdt.lutHeight;
@@ -111,7 +111,7 @@ public class BeatCircleRepr extends PDFPage{
 			PDFTools.insertTextBoxXCentered(cts, bX0+bW, bY0-pdt.space, dFormat2.format(beatPeriodTime), pdt.descSize);		
 			PDFTools.insertTextBoxXCentered(cts, bX0+(bW/2), bY0-pdt.space, "time (sec)", pdt.descSize);
 			
-			PDFTools.insertTextBoxLowerY(cts, iX0 - lDescSpacer - pdt.space, iY0 + (iH/2), dFormat1.format(imageRangeµm), pdt.subDescSize);
+			PDFTools.insertTextBoxLowerY(cts, iX0 - lDescSpacer - pdt.space, iY0 + (iH/2), dFormat1.format(imageRangeMicron), pdt.subDescSize);
 			PDFTools.insertTextBoxUpperY(cts, iX0 - lDescSpacer - pdt.space, iY0 + (iH/2), "µm", pdt.subDescSize);
 			cts.drawLine(iX0, iY0 + pdt.lineWidth, iX0 - pdt.space, iY0 + pdt.lineWidth);
 			cts.drawLine(iX0, iY0 + iH - pdt.lineWidth, iX0 - pdt.space, iY0 + iH - pdt.lineWidth);
@@ -153,7 +153,7 @@ public class BeatCircleRepr extends PDFPage{
 		xCorrection = (int) (lowerX - (imageRange - xRange)/2);
 		yCorrection = (int) (lowerY - (imageRange - yRange)/2);
 		
-		imageRangeµm = imageRange * xyCalibration;
+		imageRangeMicron = imageRange * xyCalibration;
 	}
 	
 	private void renderBeatCycleRepr() {

@@ -2,7 +2,7 @@ package spqEval.pdf;
 
 /** 
 ===============================================================================
-* SpermQEvaluator_.java Version 1.0.1
+* SpermQEvaluator_.java Version 1.0.6
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -168,7 +168,7 @@ public class FFTPlot extends PDFPlot {
 				x = pX0 + pW * z/numberOfIndicators;
 				cts.drawLine(x, y0, x, pY0);
 				desValue = (z/numberOfIndicators * xMaxFreq);
-				PDFTools.insertTextBoxXCentered(cts, x, y0 - pdt.space, Integer.toString((int) (desValue)) , pdt.subDescSize);
+				PDFTools.insertTextBoxXCentered(cts, x, y0 - pdt.space, Long.toString(Math.round(desValue)) , pdt.subDescSize);
 			} catch (IOException e) {
 				System.out.println("exception in addSideDesc");
 			}
@@ -240,7 +240,7 @@ public class FFTPlot extends PDFPlot {
 			xySeries [i] = new XYSeries(names[i]);
 		}
 
-		Result r = new Result(PDFPage.sourcePath, 5);
+		Result r = new Result(PDFPage.sourcePath,coverageThreshold);
 		data = r.getFreqResults("cAng_f");
 
 		int arcL;
@@ -257,7 +257,7 @@ public class FFTPlot extends PDFPlot {
 	
 	private void addValue(int id, int arcL) {
 		if(data[id][arcL][3] > 0) {
-			xySeries[id].add(arcL, data[id][arcL][3]);
+			xySeries[id].add(arcL*xyCalibration, data[id][arcL][3]);
 		}
 		else {
 			highestUndefined = arcL;

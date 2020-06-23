@@ -2,7 +2,7 @@ package spqEval.pdf;
 
 /** 
 ===============================================================================
-* SpermQEvaluator_.java Version 1.0.1
+* SpermQEvaluator_.java Version 1.0.6
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -53,7 +53,7 @@ public class PDFPage {
 	
 	static String sourcePath, expName, rawTargetPath, targetPath;	
 	static byte ID = 0;
-	static double imageFreq, timeOfStack, slicesPerCycle, beatPeriodTime, numberOfFrames, xyCalibration, maxArcLenght, totalTime;
+	static double imageFreq, timeOfStack, slicesPerCycle, beatPeriodTime, numberOfFrames, xyCalibration, maxArcLenght, totalTime, coverageThreshold;
 	static double zMin, zMax, nZMin, nZMax;
 	static PDDocument doc;
 	static PDPage page;
@@ -77,7 +77,9 @@ public class PDFPage {
 	
 	int undefinedColor = 0x00E000;
 	
-	public PDFPage(String sourcePath, String expName, String targetPath){	
+	public PDFPage(String sourcePath, String expName, String targetPath, double threshold){	
+		coverageThreshold = threshold;
+		
 		pdfName = expName + "_results.pdf";
 		PDFPage.rawTargetPath = targetPath;
 		PDFPage.targetPath = targetPath + "files_for_PDF" + System.getProperty("file.separator"); //subfolder for the generated data
@@ -95,18 +97,20 @@ public class PDFPage {
 		readResults();
 		getMaxArcLength();
 		
-		int leftBound1 = 50;
+		int leftBound1 = 40;
 		int leftBound2 = 320;			//left bound of 2nd column
 		int height = 150;
 		int width = 170;
 		int upperBound = 730;
 		int space = height + 40;
+		int widthKymo = 180;
+			
+		new KCAngle(leftBound1, upperBound, 120, 280);
+		new KZMedi(leftBound1 + widthKymo, upperBound, 120, 280);
+		new KY(leftBound1 + 2*widthKymo , upperBound, 120, 280);
 		
-		new BeatCircleRepr(leftBound1, 750, 150);
-		new KCAngle(270, 750, 70, 140);
-		new KZMedi(leftBound1, 520, 70, 140);
-		new HeadPositionTracker(270, 500, 120);
-		new KY(leftBound1, 280, 70, 140);
+		new BeatCircleRepr(leftBound1+20, upperBound - 410, 180);	
+		new HeadPositionTracker(leftBound1 + 270, upperBound-410, 180);
 		
 		addPage();
 		
@@ -218,7 +222,7 @@ public class PDFPage {
 					break scanningForTheta;
 				}
 			}		
-			slicesPerCycle = beatPeriodTime/(1/imageFreq);			
+			slicesPerCycle = beatPeriodTime/(1/imageFreq);	
 			fr.close();
 			br.close();
 		} catch (Exception e) {
@@ -293,6 +297,7 @@ public class PDFPage {
 	private void addPageDesc() {
 		PDFTools.insertTextBoxUpperY(cts, 20, 780, expName, pdt.headerSize);
 		PDFTools.insertTextBoxUpperY(cts, 550, 780, Integer.toString(pageNumber), pdt.headerSize);	
+		PDFTools.insertTextBoxUpperY(cts, 20, 780-pdt.headerSize-pdt.space, pdt.sourcePath, pdt.subDescSize);	
 	}
 
 	private void save(String path) {
@@ -305,4 +310,7 @@ public class PDFPage {
 			
 		}
 	}	
+	public double getSlicesPerCycle(){
+		return slicesPerCycle;
+	}
 }
