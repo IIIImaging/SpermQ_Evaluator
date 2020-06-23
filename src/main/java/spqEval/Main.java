@@ -1,7 +1,7 @@
 ﻿package spqEval;
 
 /** ===============================================================================
-* SpermQEvaluator_.java Version 1.0.7
+* SpermQEvaluator_.java Version 1.0.8
 * 
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -31,6 +31,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -54,7 +55,7 @@ import spqEval.tools.constants;
 import spqEval.tools.tools;
 
 public class Main extends javax.swing.JFrame implements ActionListener {
-	private static final String version = "1.0.7";
+	private static final String version = "1.0.8";
 	
 	private static final long serialVersionUID = 1L;	
 	
@@ -128,6 +129,9 @@ public class Main extends javax.swing.JFrame implements ActionListener {
 		
 		File home = FileSystemView.getFileSystemView().getHomeDirectory(); 
 		desktopPath = home.getAbsolutePath();
+		if(System.getProperty("os.name").toUpperCase().contains("MAC")){
+			desktopPath += System.getProperty("file.separator") + "Desktop";
+		}
 		
 		int prefXSize = 600, prefYSize = 570;
 		this.setMinimumSize(new java.awt.Dimension(prefXSize, prefYSize+40));
