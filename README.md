@@ -1,6 +1,6 @@
 # SpermQ_Evaluator
 
-A java tool to analyze and visualize results from SpermQ analysis. For details on how to use and cite *SpermQ*, please see the [SpermQ repository](https://github.com/hansenjn/SpermQ), which also provides a manual / user guide. Download the latest release of *SpermQ Evaluator* [here](https://github.com/IIIImaging/SpermQ_Evaluator/releases). 
+A java tool to analyze and visualize results from SpermQ analysis. For details on how to use and cite *SpermQ*, please visit the **[SpermQ repository](https://github.com/hansenjn/SpermQ)**, which also provides a manual / user guide. Download the latest release of *SpermQ Evaluator* [here](https://github.com/IIIImaging/SpermQ_Evaluator/releases). 
 
 Copyright (C) 2017-2020: <b>Jan N. Hansen</b>, Sebastian Rassmann, Jan F. Jikeli, and Dagmar Wachten; research group Biophysical Imaging, Institute of Innate Immunity, Bonn, Germany (http://www.iii.uni-bonn.de/en/wachten_lab/). 
 
