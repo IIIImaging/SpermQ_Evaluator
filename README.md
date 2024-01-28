@@ -1,6 +1,6 @@
-# SpermQ_Evaluator
+# ![SpermQ](https://github.com/hansenjn/SpermQ/blob/master/Webfiles/20200708%20SpermQ%20Logo%20low%20res.png?raw=true)_Evaluator
 
-A java tool to analyze and visualize results from *SpermQ* analysis. Download the latest release of *SpermQ Evaluator* [here](https://github.com/IIIImaging/SpermQ_Evaluator/releases).
+A java tool to analyze and visualize results from *SpermQ* analysis (see the **[SpermQ github repository](https://github.com/hansenjn/SpermQ)** for applying SpermQ). Download the latest release of *SpermQ Evaluator* [here](https://github.com/IIIImaging/SpermQ_Evaluator/releases).
 
 ## Using SpermQ
 For details on how to use and cite *SpermQ*, please visit the **[SpermQ repository](https://github.com/hansenjn/SpermQ)**, which provides a manual / user guide. 
